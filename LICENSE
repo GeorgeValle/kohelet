@@ -1,0 +1,64 @@
+Kohelet Source-Available Personal Use License
+Version 1.0
+
+Copyright (c) 2026 Jorge Guillermo Valle.
+All rights reserved.
+
+This license applies to the Kohelet source code, documentation, designs, project files, and related materials contained in this repository, unless a file explicitly states a different license.
+
+1. Permission Granted
+
+You may:
+
+- View, clone, download, and fork this repository.
+- Run the software locally for personal, private, non-commercial use.
+- Study the source code for learning, review, or portfolio evaluation.
+- Modify the source code for your own private, non-commercial use.
+- Use small ideas, patterns, or general concepts learned from the project, provided you do not copy substantial portions of the code, design, documentation, or product identity.
+
+2. Restrictions
+
+You may not, without prior written permission from the copyright holder:
+
+- Sell, rent, sublicense, publish, distribute, or otherwise commercially exploit this software or any substantial portion of it.
+- Use this software, or a modified version of it, as the basis for a commercial product, paid service, SaaS offering, marketplace product, template, starter kit, course material, or client deliverable.
+- Redistribute modified or unmodified copies of the software.
+- Create, publish, or sell a competing product that copies the structure, source code, architecture, documentation, design system, product identity, or distinctive features of Kohelet.
+- Remove or alter copyright notices, license notices, attribution, or authorship references.
+- Use the names "Kohelet", "Sofer", related branding, logos, product names, or visual identity in a way that suggests endorsement, ownership, or affiliation.
+
+3. Private Modifications
+
+You may modify the software only for your own private, non-commercial use.
+
+Private modifications may not be published, redistributed, sold, sublicensed, or used in a public or commercial product without prior written permission from the copyright holder.
+
+4. Contributions
+
+Unless otherwise agreed in writing, any contribution submitted to this repository is provided under the same terms as this license.
+
+By submitting a contribution, you confirm that you have the right to submit it and that it may be incorporated into the project under this license.
+
+5. Third-Party Dependencies
+
+Third-party libraries, frameworks, tools, fonts, icons, and dependencies used by this project remain governed by their own licenses.
+
+This license does not grant rights over third-party materials that are not owned by the copyright holder.
+
+6. No Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, SECURITY, RELIABILITY, OR AVAILABILITY.
+
+The copyright holder is not liable for any claim, damage, data loss, business loss, or other liability arising from the use of the software.
+
+7. Commercial Permission
+
+For commercial use, redistribution, sublicensing, publication of modified versions, or use as the basis of a paid product or service, you must obtain prior written permission from:
+
+Jorge Guillermo Valle
+
+8. Summary
+
+You can read, download, run, study, and privately modify this project for non-commercial use.
+
+You cannot sell it, redistribute it, repackage it, use it as a commercial product, or build a paid competing product from it without permission.
