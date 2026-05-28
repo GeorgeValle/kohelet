@@ -1,0 +1,1 @@
+import type { EntityId } from './ids';import type { Part } from './partModel';import type { Chapter } from './chapterModel';export type Work={id:EntityId;title:string;parts:Part[];chapters:Chapter[]};

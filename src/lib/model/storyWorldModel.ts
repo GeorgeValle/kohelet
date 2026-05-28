@@ -1,0 +1,1 @@
+import type { EntityId } from './ids';import type { Work } from './workModel';import type { NarrativeCore } from './narrativeCoreModel';export type StoryWorld={id:EntityId;title:string;narrativeCore:NarrativeCore;works:Work[]};

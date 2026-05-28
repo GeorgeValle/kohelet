@@ -1,0 +1,3 @@
+import type { Editor } from '@tiptap/core';
+const run=(e:Editor|null,fn:(x:Editor)=>void)=>{if(!e)return;fn(e)};
+export const editorCommands={toggleBold:(e:Editor|null)=>run(e,x=>{x.chain().focus().toggleBold().run();}),toggleItalic:(e:Editor|null)=>run(e,x=>{x.chain().focus().toggleItalic().run();}),setParagraph:(e:Editor|null)=>run(e,x=>{x.chain().focus().setParagraph().run();}),setHeading:(e:Editor|null)=>run(e,x=>{x.chain().focus().toggleHeading({level:1}).run();}),undo:(e:Editor|null)=>run(e,x=>{x.chain().focus().undo().run();}),redo:(e:Editor|null)=>run(e,x=>{x.chain().focus().redo().run();})};

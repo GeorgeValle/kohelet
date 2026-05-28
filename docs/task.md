@@ -48,48 +48,48 @@ Formato recomendado:
 
 ### 2.1. Archivos raíz
 
-- [ ] Crear `README.md`.
-- [ ] Crear `AGENTS.md`.
-- [ ] Crear `DESIGN.md`.
-- [ ] Crear `roadmap.md`.
-- [ ] Crear `project_requirements.md`.
-- [ ] Crear `LICENSE`.
+- [x] Crear `README.md`.
+- [x] Crear `AGENTS.md`.
+- [x] Crear `DESIGN.md`.
+- [x] Crear `roadmap.md`.
+- [x] Crear `project_requirements.md`.
+- [x] Crear `LICENSE`.
 
 ### 2.2. Carpeta `docs/`
 
-- [ ] Crear `docs/index.md`.
-- [ ] Crear `docs/task.md`.
-- [ ] Crear `docs/decisions.md`.
-- [ ] Crear `docs/codex-workflow.md`.
-- [ ] Crear `docs/architecture.md`.
-- [ ] Crear `docs/data-model.md`.
-- [ ] Crear `docs/editor-core.md`.
-- [ ] Crear `docs/export.md`.
-- [ ] Crear `docs/glossary.md`.
-- [ ] Crear `docs/i18n.md`.
-- [ ] Crear `docs/release.md`.
-- [ ] Crear `docs/storage.md`.
-- [ ] Crear `docs/testing.md`.
+- [x] Crear `docs/index.md`.
+- [x] Crear `docs/task.md`.
+- [x] Crear `docs/decisions.md`.
+- [x] Crear `docs/codex-workflow.md`.
+- [x] Crear `docs/architecture.md`.
+- [x] Crear `docs/data-model.md`.
+- [x] Crear `docs/editor-core.md`.
+- [x] Crear `docs/export.md`.
+- [x] Crear `docs/glossary.md`.
+- [x] Crear `docs/i18n.md`.
+- [x] Crear `docs/release.md`.
+- [x] Crear `docs/storage.md`.
+- [x] Crear `docs/testing.md`.
 
 ### 2.3. Carpeta `docs/phases/`
 
-- [ ] Crear `docs/phases/phase-00-repository-setup.md`.
-- [ ] Crear `docs/phases/phase-01-foundation.md`.
-- [ ] Crear `docs/phases/phase-02-editor-core.md`.
-- [ ] Crear `docs/phases/phase-03-narrative-structure.md`.
-- [ ] Crear `docs/phases/phase-04-writing-modules.md`.
-- [ ] Crear `docs/phases/phase-05-storage-recovery.md`.
-- [ ] Crear `docs/phases/phase-06-export.md`.
-- [ ] Crear `docs/phases/phase-07-polish-release.md`.
+- [x] Crear `docs/phases/phase-00-repository-setup.md`.
+- [x] Crear `docs/phases/phase-01-foundation.md`.
+- [x] Crear `docs/phases/phase-02-editor-core.md`.
+- [x] Crear `docs/phases/phase-03-narrative-structure.md`.
+- [x] Crear `docs/phases/phase-04-writing-modules.md`.
+- [x] Crear `docs/phases/phase-05-storage-recovery.md`.
+- [x] Crear `docs/phases/phase-06-export.md`.
+- [x] Crear `docs/phases/phase-07-polish-release.md`.
 
 ### 2.4. Skills del proyecto
 
-- [ ] Crear `.agents/skills/css-modules-ui/SKILL.md`.
-- [ ] Crear `.agents/skills/rich-text-editor/SKILL.md`.
-- [ ] Crear `.agents/skills/tauri-storage/SKILL.md`.
-- [ ] Crear `.agents/skills/i18n-ui/SKILL.md`.
-- [ ] Crear `.agents/skills/testing-react/SKILL.md`.
-- [ ] Crear `.agents/skills/docs-maintenance/SKILL.md`.
+- [x] Crear `.agents/skills/css-modules-ui/SKILL.md`.
+- [x] Crear `.agents/skills/rich-text-editor/SKILL.md`.
+- [x] Crear `.agents/skills/tauri-storage/SKILL.md`.
+- [x] Crear `.agents/skills/i18n-ui/SKILL.md`.
+- [x] Crear `.agents/skills/testing-react/SKILL.md`.
+- [x] Crear `.agents/skills/docs-maintenance/SKILL.md`.
 
 ---
 
@@ -99,12 +99,12 @@ Objetivo: dejar el repo listo para recibir implementación.
 
 - [ ] Crear repo `kohelet` en GitHub.
 - [ ] Clonar repo vacío en local.
-- [ ] Agregar documentación base.
-- [ ] Agregar skills locales del proyecto.
-- [ ] Agregar licencia.
-- [ ] Confirmar estructura inicial de carpetas.
+- [x] Agregar documentación base.
+- [x] Agregar skills locales del proyecto.
+- [x] Agregar licencia.
+- [x] Confirmar estructura inicial de carpetas.
 - [ ] Hacer primer commit de documentación.
-- [ ] Actualizar `docs/phases/phase-00-repository-setup.md`.
+- [x] Actualizar `docs/phases/phase-00-repository-setup.md`.
 
 Commit sugerido:
 
@@ -119,17 +119,17 @@ git commit -m "chore: initialize project documentation and Codex skills"
 
 Objetivo: inicializar la app con stack base.
 
-- [ ] Inicializar Tauri 2 + React + TypeScript + Vite.
-- [ ] Configurar `pnpm` como package manager.
-- [ ] Crear estructura base de `src/`.
-- [ ] Crear `src/styles/tokens.css`.
-- [ ] Crear `src/styles/globals.css`.
-- [ ] Configurar CSS Modules.
-- [ ] Configurar Vitest.
-- [ ] Configurar React Testing Library.
+- [x] Inicializar Tauri 2 + React + TypeScript + Vite.
+- [x] Configurar `pnpm` como package manager.
+- [x] Crear estructura base de `src/`.
+- [x] Crear `src/styles/tokens.css`.
+- [x] Crear `src/styles/globals.css`.
+- [x] Configurar CSS Modules.
+- [x] Configurar Vitest.
+- [x] Configurar React Testing Library.
 - [ ] Configurar lint si aplica.
-- [ ] Crear `src/i18n/locales/es-AR.json`.
-- [ ] Crear carga inicial de i18n.
+- [x] Crear `src/i18n/locales/es-AR.json`.
+- [x] Crear carga inicial de i18n.
 - [ ] Validar `pnpm run build`.
 - [ ] Validar `pnpm run test`.
 - [ ] Actualizar `docs/phases/phase-01-foundation.md`.
