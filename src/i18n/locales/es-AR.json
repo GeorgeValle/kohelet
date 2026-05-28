@@ -1,0 +1,8 @@
+{
+  "app": {
+    "shellLabel": "Base técnica de Kohelet",
+    "editorName": "Sofer",
+    "tagline": "Una aplicación de escritorio para planificar, escribir y proteger obras narrativas.",
+    "foundationStatus": "Base mínima lista para validar React, TypeScript, Vite, pnpm y Tauri."
+  }
+}

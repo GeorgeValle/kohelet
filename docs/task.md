@@ -6,7 +6,7 @@
 **Proyecto:** Kohelet  
 **Editor:** Sofer  
 **Estado del documento:** inicial  
-**Última revisión:** 2026-05-24
+**Última revisión:** 2026-05-28
 
 ---
 
@@ -119,20 +119,29 @@ git commit -m "chore: initialize project documentation and Codex skills"
 
 Objetivo: inicializar la app con stack base.
 
-- [ ] Inicializar Tauri 2 + React + TypeScript + Vite.
-- [ ] Configurar `pnpm` como package manager.
-- [ ] Crear estructura base de `src/`.
-- [ ] Crear `src/styles/tokens.css`.
-- [ ] Crear `src/styles/globals.css`.
-- [ ] Configurar CSS Modules.
-- [ ] Configurar Vitest.
-- [ ] Configurar React Testing Library.
-- [ ] Configurar lint si aplica.
-- [ ] Crear `src/i18n/locales/es-AR.json`.
-- [ ] Crear carga inicial de i18n.
-- [ ] Validar `pnpm run build`.
-- [ ] Validar `pnpm run test`.
+- [~] Inicializar Tauri 2 + React + TypeScript + Vite. Scaffold mínimo creado; validación bloqueada por `pnpm install` sin acceso al registro npm.
+- [~] Configurar `pnpm` como package manager. Scripts agregados; `pnpm-lock.yaml` queda pendiente porque `pnpm install` no pudo resolver dependencias por bloqueo de red.
+- [x] Crear estructura base de `src/`.
+- [x] Crear `src/styles/tokens.css`.
+- [x] Crear `src/styles/globals.css`.
+- [x] Configurar CSS Modules.
+- [x] Configurar Vitest.
+- [x] Configurar React Testing Library.
+- [x] Configurar lint si aplica.
+- [x] Crear `src/i18n/locales/es-AR.json`.
+- [x] Crear carga inicial de i18n.
+- [!] Validar `pnpm run build`. Intentado el 2026-05-28; falla porque `pnpm install` no pudo descargar dependencias desde el registro npm.
+- [!] Validar `pnpm run test`. Intentado el 2026-05-28; falla porque `pnpm install` no pudo descargar dependencias desde el registro npm.
 - [ ] Actualizar `docs/phases/phase-01-foundation.md`.
+
+### 4.1. Primer commit técnico limpio — 2026-05-28
+
+- [x] Crear scripts requeridos: `dev`, `build`, `lint`, `test`, `preview`, `tauri`, `tauri:dev`.
+- [x] Crear scaffold Tauri 2 mínimo sin iconos reales y con `bundle.icon` vacío.
+- [x] Crear `src-tauri/icons/.gitkeep`.
+- [x] Mantener fuera de alcance CI, Tiptap, Sofer completo, storage, exportación y modelos narrativos completos.
+- [!] Ejecutar `pnpm install`. Resultado real: bloqueado por `ERR_PNPM_FETCH_403` al consultar el registro npm desde el entorno; no se pudo generar un `pnpm-lock.yaml` válido.
+- [!] Ejecutar `pnpm run lint`, `pnpm run test` y `pnpm run build`. Resultado real: bloqueados porque `node_modules` no pudo instalarse.
 
 ---
 
