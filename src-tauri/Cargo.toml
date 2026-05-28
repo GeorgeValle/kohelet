@@ -1,0 +1,16 @@
+[package]
+name = "kohelet"
+version = "0.0.0"
+description = "Kohelet desktop application"
+authors = ["Kohelet"]
+edition = "2021"
+
+[lib]
+name = "kohelet_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }

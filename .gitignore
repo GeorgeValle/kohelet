@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.vite/
+*.local
+
+# Tauri / Rust
+src-tauri/target/
+
+# TypeScript
+*.tsbuildinfo
