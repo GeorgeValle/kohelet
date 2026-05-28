@@ -12,7 +12,7 @@
 
 ## Estado de validación actual (2026-05-28)
 
-- [!] `pnpm install` bloqueado por `ERR_PNPM_FETCH_403` contra `https://registry.npmjs.org/` en este entorno.
+- [!] `pnpm install` bloqueado por `ERR_PNPM_FETCH_403` contra `https://registry.npmjs.org/@testing-library%2Fjest-dom` en este entorno.
 - [x] `pnpm run lint` ejecutado correctamente.
 - [ ] `pnpm run test` no validado por falta de `node_modules` (`vitest: not found`).
 - [ ] `pnpm run build` no validado por falta de dependencias de tipos (`@testing-library/jest-dom`, `vitest/globals`).
