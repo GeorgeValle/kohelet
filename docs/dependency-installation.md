@@ -4,7 +4,7 @@
 
 ## Configuración actual
 
-- El proyecto usa `pnpm@10.28.1`, declarado en `package.json` mediante `packageManager`.
+- El proyecto usa `pnpm@11.1.2`, declarado en `package.json` mediante `packageManager`.
 - El repositorio fija el registro público de npm en `.npmrc` y no define tokens de autenticación, para evitar que paquetes públicos se resuelvan por accidente contra un registro privado o credenciales de GitHub Packages.
 - El repositorio todavía no tiene `pnpm-lock.yaml` commiteado. Hasta que exista un lockfile, CI instala con `pnpm install --no-frozen-lockfile`; cuando el lockfile exista, CI cambia automáticamente a `pnpm install --frozen-lockfile`.
 

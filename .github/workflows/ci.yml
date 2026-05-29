@@ -26,20 +26,36 @@ jobs:
         with:
           node-version: 24
 
-      - name: Print registry diagnostics
-        run: |
-          pnpm config get registry
-          npm config get registry
-          pnpm config list
-          npm config list
-
       - name: Install dependencies
         run: |
+          set -euxo pipefail
+
+          echo "Node version:"
+          node -v
+
+          echo "Corepack version:"
+          corepack --version
+
+          echo "pnpm version:"
+          pnpm -v
+
+          echo "Registry:"
+          pnpm config get registry
+          npm config get registry
+
+          echo "Proxy environment:"
+          env | grep -i proxy || true
+
+          echo "Checking npm registry reachability:"
+          npm view @eslint/js version --registry=https://registry.npmjs.org/
+          npm view @tiptap/react version --registry=https://registry.npmjs.org/
+          npm view @tiptap/starter-kit version --registry=https://registry.npmjs.org/
+
           if [ -f pnpm-lock.yaml ]; then
-            pnpm install --frozen-lockfile
+            pnpm install --frozen-lockfile --reporter=append-only
           else
             echo "pnpm-lock.yaml is missing; installing with --no-frozen-lockfile until the lockfile is committed."
-            pnpm install --no-frozen-lockfile
+            pnpm install --no-frozen-lockfile --reporter=append-only
           fi
 
       - name: Lint
