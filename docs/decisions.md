@@ -587,3 +587,40 @@ Permite instrucciones especializadas por tipo de tarea.
 ### Seguimiento
 
 - Mantener skills actualizadas cuando cambie la arquitectura.
+
+---
+
+## ADR — Dependency installation baseline
+
+**Fecha:** 2026-05-29
+**Estado:** aceptada
+**Documentos relacionados:** `package.json`, `.npmrc`, `.github/workflows/ci.yml`, `docs/dependency-installation.md`, `docs/task.md`
+
+### Contexto
+
+PR #4 dejó el flujo web de GitHub Actions en verde con el primer editor mínimo Sofer, pero el repositorio todavía no tiene `pnpm-lock.yaml` y el entorno de Codex Cloud puede fallar al instalar dependencias con `ERR_PNPM_FETCH_403`.
+
+### Decisión
+
+- Use `pnpm@10.28.1` for the current baseline.
+- Use Node 22 in GitHub Actions.
+- Keep the npm public registry explicit through `.npmrc`.
+- Do not use GitHub Packages or auth tokens unless private packages are introduced.
+- Keep `pnpm install --no-frozen-lockfile` only while `pnpm-lock.yaml` is absent.
+- Switch to `--frozen-lockfile` and enable pnpm cache once `pnpm-lock.yaml` is committed.
+- Treat Codex Cloud `ERR_PNPM_FETCH_403` as an environment/proxy limitation when GitHub Actions validates successfully.
+
+### Motivo
+
+La instalación debe ser reproducible y fácil de diagnosticar sin introducir credenciales innecesarias ni cambios de alcance. GitHub Actions ya validó la instalación, lint, tests y build web con Node 22, `pnpm@10.28.1` y el registro público de npm.
+
+### Consecuencias
+
+- CI mantiene el fallback `--no-frozen-lockfile` solo hasta que exista `pnpm-lock.yaml`.
+- `cache: pnpm` permanece deshabilitado hasta que el lockfile esté commiteado.
+- Un 403 de Codex Cloud no debe resolverse cambiando features, Tiptap, Sofer, UI, storage, exportación o modelos narrativos.
+
+### Seguimiento
+
+- Generar y commitear `pnpm-lock.yaml` desde un entorno con acceso válido a npm.
+- Después del lockfile, simplificar CI a `pnpm install --frozen-lockfile --reporter=append-only` y habilitar `cache: pnpm`.

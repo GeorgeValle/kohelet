@@ -1,37 +1,33 @@
 # Instalación de dependencias — Kohelet
 
-> Notas operativas para diagnosticar y validar la instalación de dependencias.
+> Línea base formal para instalar, diagnosticar y validar dependencias de Kohelet con pnpm, Node y GitHub Actions.
 
-## Configuración actual
+## Stack de instalación actual
 
-- El proyecto usa `pnpm@10.28.1`, declarado en `package.json` mediante `packageManager`; esa es la línea base real del PR actual.
-- El repositorio fija el registro público de npm en `.npmrc` y no define tokens de autenticación, para evitar que paquetes públicos se resuelvan por accidente contra un registro privado o credenciales de GitHub Packages.
-- El repositorio todavía no tiene `pnpm-lock.yaml` commiteado. Hasta que exista un lockfile, CI instala con `pnpm install --no-frozen-lockfile`; cuando el lockfile exista, CI cambia automáticamente a `pnpm install --frozen-lockfile`.
+- Runtime recomendado para CI: Node 22.
+- Package manager único: `pnpm@10.28.1`, declarado en `package.json` mediante `packageManager`.
+- Registro esperado: `https://registry.npmjs.org/`.
+- Workflow de validación web: `.github/workflows/ci.yml`.
+- Lockfile: `pnpm-lock.yaml` todavía no está commiteado porque no debe generarse desde un entorno que falle al acceder al registro npm.
 
-## Diagnóstico de registry
+No actualizar a pnpm 11 ni cambiar el registro de paquetes dentro de una PR de documentación o diagnóstico de instalación. Ese tipo de cambio requiere una decisión separada.
 
-Cuando `pnpm install` falle, revisar la configuración efectiva de registry y auth/proxy antes de cambiar dependencias:
+## `.npmrc` esperado
 
-```bash
-pnpm config get registry
-npm config get registry
-pnpm config list
-npm config list
+El repositorio debe mantener un `.npmrc` explícito y mínimo:
+
+```ini
+registry=https://registry.npmjs.org/
+always-auth=false
+auto-install-peers=true
+strict-peer-dependencies=false
 ```
 
-Registro esperado:
+Esta configuración fuerza el registro público de npm para dependencias públicas y evita depender de tokens locales o de GitHub Packages. No agregar `NODE_AUTH_TOKEN`, tokens personales, ni configuración de GitHub Packages mientras el proyecto no use paquetes privados.
 
-```text
-https://registry.npmjs.org/
-```
+## Diferencia entre Codex Cloud y GitHub Actions
 
-Si el registro es correcto pero los requests fallan con `ERR_PNPM_FETCH_403`, revisar variables de proxy del entorno como `HTTP_PROXY`, `HTTPS_PROXY`, `npm_config_http_proxy` y `npm_config_https_proxy`. Un proxy puede devolver 403 antes de que npm reciba el request; en ese caso cambiar versiones de paquetes, alcance de Tiptap o código de la app no corrige la instalación.
-
-## Validación en CI
-
-GitHub Actions ejecuta un único workflow, `.github/workflows/ci.yml`, en pull requests y pushes a `main`.
-
-Estado confirmado del workflow en GitHub Actions:
+GitHub Actions es la fuente confiable de validación para la instalación actual porque PR #4 logró CI verde con:
 
 ```bash
 pnpm install --no-frozen-lockfile --reporter=append-only
@@ -40,8 +36,117 @@ pnpm run test
 pnpm run build
 ```
 
-Los cuatro pasos pasaron en CI con la versión real declarada en `package.json` (`pnpm@10.28.1`), Node 22 y el registro público `https://registry.npmjs.org/`.
+El entorno de Codex Cloud puede fallar con `ERR_PNPM_FETCH_403` aun cuando `.npmrc` apunte correctamente a `https://registry.npmjs.org/`. En ese caso, la causa esperada es una limitación de entorno, proxy, red o política de acceso antes de que el request llegue correctamente al registro público. Cambiar Sofer, Tiptap, UI, storage, exportación o modelos narrativos no resuelve ese 403.
 
-El workflow imprime versiones de Node/pnpm, registry y variables de proxy antes de instalar dependencias para que problemas de registry, proxy o auth queden visibles en el log del job. Mientras no exista `pnpm-lock.yaml`, no usa cache de pnpm y ejecuta `pnpm install --no-frozen-lockfile --reporter=append-only`.
+## Cuándo usar `--no-frozen-lockfile`
 
-La instalación local en el entorno de Codex puede seguir fallando con `ERR_PNPM_FETCH_403` por el proxy del entorno; esa falla local no contradice el estado verde de GitHub Actions.
+Usar:
+
+```bash
+pnpm install --no-frozen-lockfile --reporter=append-only
+```
+
+solo mientras `pnpm-lock.yaml` no exista en el repositorio. Este modo permite que GitHub Actions resuelva dependencias desde `package.json` y mantenga verde la validación web hasta que se genere un lockfile válido desde un entorno con acceso correcto al registro npm.
+
+## Cuándo pasar a `--frozen-lockfile`
+
+Después de commitear `pnpm-lock.yaml`, cambiar la instalación de CI a:
+
+```bash
+pnpm install --frozen-lockfile --reporter=append-only
+```
+
+Desde ese momento, fallar si `package.json` y `pnpm-lock.yaml` divergen es deseable: protege reproducibilidad y evita actualizaciones implícitas de dependencias.
+
+## Cuándo habilitar `cache: pnpm`
+
+No usar `cache: pnpm` en `actions/setup-node@v4` mientras falte `pnpm-lock.yaml`, porque el cache de pnpm de `setup-node` requiere un lockfile estable para calcular la clave de cache.
+
+Habilitarlo únicamente cuando `pnpm-lock.yaml` esté commiteado y CI use siempre `--frozen-lockfile`:
+
+```yaml
+- name: Setup Node.js
+  uses: actions/setup-node@v4
+  with:
+    node-version: 22
+    cache: pnpm
+```
+
+## Cómo generar `pnpm-lock.yaml`
+
+Desde un entorno local o remoto con acceso válido al registro público de npm:
+
+```bash
+pnpm install
+```
+
+Si el comando termina correctamente:
+
+1. revisar que se haya creado `pnpm-lock.yaml`;
+2. commitear `pnpm-lock.yaml`;
+3. actualizar `.github/workflows/ci.yml` para usar siempre `pnpm install --frozen-lockfile --reporter=append-only`;
+4. habilitar `cache: pnpm` en `actions/setup-node@v4`;
+5. validar `pnpm run lint`, `pnpm run test` y `pnpm run build`.
+
+Si `pnpm install` falla con `ERR_PNPM_FETCH_403`, no commitear un lockfile parcial ni cambiar dependencias para sortear la red del entorno. Registrar el fallo y generar el lockfile desde otro entorno con acceso correcto a npm.
+
+## Comandos locales recomendados
+
+```bash
+pnpm install
+pnpm run lint
+pnpm run test
+pnpm run build
+```
+
+Si se trabaja en Tauri y las dependencias están instaladas correctamente, validar también:
+
+```bash
+pnpm run tauri:build
+```
+
+`tauri:build` no forma parte del workflow web actual y sigue pendiente hasta que se valide explícitamente el flujo de escritorio.
+
+## Comandos de CI actuales
+
+Mientras falte `pnpm-lock.yaml`, el workflow debe instalar con fallback:
+
+```bash
+if [ -f pnpm-lock.yaml ]; then
+  pnpm install --frozen-lockfile --reporter=append-only
+else
+  echo "pnpm-lock.yaml is missing; installing with --no-frozen-lockfile until the lockfile is committed."
+  pnpm install --no-frozen-lockfile --reporter=append-only
+fi
+```
+
+Luego debe ejecutar:
+
+```bash
+pnpm run lint
+pnpm run test
+pnpm run build
+```
+
+## Troubleshooting de `ERR_PNPM_FETCH_403`
+
+1. Confirmar versiones y registry:
+
+   ```bash
+   node -v
+   pnpm -v
+   npm config get registry
+   pnpm config get registry
+   ```
+
+2. Confirmar que `.npmrc` mantiene el registro público y no contiene tokens.
+3. Revisar variables de entorno de proxy o autenticación:
+
+   ```bash
+   env | grep -i proxy || true
+   env | grep -i token || true
+   ```
+
+4. Si el error dice que no se envió authorization header y aun así el registro es `https://registry.npmjs.org/`, tratarlo como limitación del entorno/proxy cuando GitHub Actions valida correctamente.
+5. No agregar GitHub Packages, `NODE_AUTH_TOKEN` ni credenciales para resolver dependencias públicas.
+6. No modificar Sofer, Tiptap, UI, storage, exportación ni modelos narrativos como respuesta a un 403 de instalación.
