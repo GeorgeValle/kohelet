@@ -5,8 +5,8 @@
 
 **Proyecto:** Kohelet  
 **Editor:** Sofer  
-**Estado:** inicial  
-**Última revisión:** 2026-05-24
+**Estado:** primer editor mínimo implementado  
+**Última revisión:** 2026-05-29
 
 ---
 
@@ -400,3 +400,18 @@ Antes de cerrar cambios en Sofer:
 - [ ] El editor no se desmonta por abrir/cerrar panel contextual.
 - [ ] Se agregaron o actualizaron tests mínimos.
 - [ ] Se actualizó `docs/task.md` si corresponde.
+---
+
+## 18. Implementación mínima actual — 2026-05-29
+
+El primer Sofer mínimo monta Tiptap con StarterKit para una escena mock activa. La integración actual cubre solo escritura básica en memoria:
+
+- `EditorShell` coordina instancia del editor, toolbar, superficie editable y status bar.
+- `RichTextToolbar` muestra únicamente párrafo, título, negrita, cursiva, deshacer y rehacer.
+- `editorCommands.ts` centraliza los comandos invocados desde la toolbar.
+- `editorExtensions.ts` centraliza StarterKit.
+- `editorSerialization.ts` define `emptyDoc`, `normalizeDoc` y `getEditorJson` para tratar el contenido como JSON estructurado.
+- `wordCount.ts` cuenta palabras a partir del texto del editor.
+
+Sigue fuera de alcance para esta implementación: storage real, autosave, snapshots, recuperación, exportación y modelo narrativo persistente completo.
+

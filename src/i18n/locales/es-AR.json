@@ -1,8 +1,29 @@
 {
   "app": {
-    "shellLabel": "Base técnica de Kohelet",
+    "title": "Kohelet",
+    "shellLabel": "Espacio de escritura de Kohelet",
     "editorName": "Sofer",
     "tagline": "Una aplicación de escritorio para planificar, escribir y proteger obras narrativas.",
     "foundationStatus": "Base mínima lista para validar React, TypeScript, Vite, pnpm y Tauri."
+  },
+  "editor": {
+    "title": "Sofer",
+    "sceneLabel": "Escena activa",
+    "mockSceneTitle": "Escena inicial",
+    "placeholder": "Empezá a escribir esta escena...",
+    "toolbar": {
+      "label": "Herramientas básicas de Sofer",
+      "paragraph": "Párrafo",
+      "heading": "Título",
+      "bold": "Negrita",
+      "italic": "Cursiva",
+      "undo": "Deshacer",
+      "redo": "Rehacer"
+    },
+    "status": {
+      "label": "Estado del editor",
+      "saved": "Guardado local pendiente de implementar",
+      "words": "{count} palabras"
+    }
   }
 }

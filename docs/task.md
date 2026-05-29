@@ -162,21 +162,21 @@ Objetivo: inicializar la app con stack base.
 
 Objetivo: crear el editor base de escritura por escena.
 
-- [ ] Instalar y configurar Tiptap.
-- [ ] Crear `RichTextEditor.tsx`.
-- [ ] Crear `RichTextEditor.module.css`.
-- [ ] Crear `RichTextToolbar.tsx`.
-- [ ] Crear `RichTextToolbar.module.css`.
-- [ ] Crear `EditorShell.tsx`.
-- [ ] Crear `EditorStatusBar.tsx`.
-- [ ] Definir extensiones iniciales del editor.
-- [ ] Crear comandos desacoplados en `lib/editor/`.
-- [ ] Guardar contenido como JSON estructurado.
+- [x] Instalar y configurar Tiptap. Dependencias declaradas; instalación bloqueada por `ERR_PNPM_FETCH_403` del registro npm en el entorno.
+- [x] Crear `RichTextEditor.tsx`.
+- [x] Crear `RichTextEditor.module.css`.
+- [x] Crear `RichTextToolbar.tsx`.
+- [x] Crear `RichTextToolbar.module.css`.
+- [x] Crear `EditorShell.tsx`.
+- [x] Crear `EditorStatusBar.tsx`.
+- [x] Definir extensiones iniciales del editor.
+- [x] Crear comandos desacoplados en `lib/editor/`.
+- [x] Tratar contenido como JSON estructurado con helpers mínimos; storage real sigue fuera de alcance.
 - [ ] Preservar cursor y selección al abrir/cerrar paneles.
-- [ ] Evitar toolbar tipo Word completa.
-- [ ] Crear tests mínimos del editor.
-- [ ] Actualizar `docs/editor-core.md`.
-- [ ] Actualizar `docs/phases/phase-02-editor-core.md`.
+- [x] Evitar toolbar tipo Word completa.
+- [x] Crear tests mínimos del editor.
+- [x] Actualizar `docs/editor-core.md`.
+- [x] Actualizar `docs/phases/phase-02-editor-core.md`.
 
 ---
 
@@ -212,8 +212,8 @@ StoryWorld → Work → Part → Chapter → Scene
 
 Objetivo: permitir escritura concentrada y consulta contextual temporal.
 
-- [ ] Crear `WritingWorkspace.tsx`.
-- [ ] Crear `WritingWorkspace.module.css`.
+- [x] Crear `WritingWorkspace.tsx`.
+- [x] Crear `WritingWorkspace.module.css`.
 - [ ] Crear `ContextualLayout.tsx`.
 - [ ] Crear `ContextualLayout.module.css`.
 - [ ] Implementar modo concentración.
@@ -222,7 +222,7 @@ Objetivo: permitir escritura concentrada y consulta contextual temporal.
 - [ ] Crear panel izquierdo de árbol narrativo.
 - [ ] Permitir ocultar paneles.
 - [ ] Mantener editor montado al abrir/cerrar contexto.
-- [ ] Usar tokens de `tokens.css`.
+- [x] Usar tokens de `tokens.css`.
 - [ ] Usar CSS Modules para componentes.
 - [ ] Actualizar `DESIGN.md` si cambia el comportamiento visual.
 - [ ] Actualizar `docs/phases/phase-03-narrative-structure.md` o crear nota en fase correspondiente.
