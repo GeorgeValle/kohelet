@@ -120,7 +120,7 @@ git commit -m "chore: initialize project documentation and Codex skills"
 Objetivo: inicializar la app con stack base.
 
 - [~] Inicializar Tauri 2 + React + TypeScript + Vite. Scaffold mínimo creado y `bundle.icon` configurado con iconos reales; validación web pasó en GitHub Actions, mientras que la validación Tauri de escritorio sigue pendiente.
-- [~] Configurar `pnpm` como package manager. Scripts requeridos agregados, incluido `tauri:build`; GitHub Actions instaló dependencias con `pnpm@10.28.1`, pero `pnpm-lock.yaml` sigue pendiente porque no debe generarse desde el entorno local bloqueado.
+- [~] Configurar `pnpm` como package manager. Scripts requeridos agregados, incluido `tauri:build`; `package.json` declara nuevamente el `packageManager` real usado por el PR (`pnpm@10.28.1`) y GitHub Actions instaló dependencias con esa versión, pero `pnpm-lock.yaml` sigue pendiente porque no debe generarse desde el entorno local bloqueado.
 - [x] Crear estructura base de `src/`.
 - [x] Crear `src/styles/tokens.css`.
 - [x] Crear `src/styles/globals.css`.
@@ -157,10 +157,10 @@ Objetivo: inicializar la app con stack base.
 - [!] Ejecutar `pnpm run tauri:build`. Resultado real local: bloqueado porque el binario `tauri` no está disponible tras fallar la instalación local; no forma parte del workflow web actual.
 - [x] Investigar instalación de dependencias: no hay `pnpm-lock.yaml`, el registro efectivo es `https://registry.npmjs.org/`, el entorno local de Codex devuelve 403 desde el proxy configurado antes de llegar al registro npm, y GitHub Actions sí pudo instalar dependencias desde el registro público.
 - [x] Agregar `.npmrc` explícito para usar npm público sin tokens de autenticación del proyecto, con `always-auth=false`, `auto-install-peers=true` y `strict-peer-dependencies=false`.
-- [x] Revertir `packageManager` a `pnpm@10.28.1` para mantener la línea base previa y separar el cambio de versión de pnpm del PR de Sofer.
+- [x] Revertir `packageManager` a la versión real usada por `package.json`, `pnpm@10.28.1`, para mantener la línea base previa y separar cualquier cambio mayor de pnpm del PR de Sofer.
 - [x] Simplificar `.github/workflows/ci.yml` como único workflow de CI con Node 22, diagnóstico mínimo de entorno, instalación pnpm con fallback sin lockfile y validaciones `lint`, `test` y `build`.
 - [x] Mantener un único workflow `.github/workflows/ci.yml` para diagnosticar configuración de registry e instalación con pnpm 10 desde GitHub Actions, sin `cache: pnpm` hasta commitear `pnpm-lock.yaml`.
-- [x] Confirmar GitHub Actions CI verde para `pnpm install`, `pnpm run lint`, `pnpm run test` y `pnpm run build`.
+- [x] Confirmar GitHub Actions CI verde para `pnpm install --no-frozen-lockfile --reporter=append-only`, `pnpm run lint`, `pnpm run test` y `pnpm run build`.
 - [x] Documentar diagnóstico de instalación en `docs/dependency-installation.md`.
 - [ ] Generar y commitear `pnpm-lock.yaml` desde un entorno con acceso válido al registro npm; CI usará `--frozen-lockfile` cuando exista.
 

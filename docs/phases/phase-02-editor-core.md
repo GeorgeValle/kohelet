@@ -26,9 +26,10 @@ Crear el primer editor Sofer mínimo para escribir una escena activa con Tiptap,
 
 ## Validation
 
-- `pnpm add @tiptap/react @tiptap/starter-kit` fue intentado, pero el registro npm respondió `ERR_PNPM_FETCH_403`; las dependencias quedaron declaradas manualmente en `package.json`.
-- `pnpm install` fue intentado y falló por `ERR_PNPM_FETCH_403` al consultar el registro npm.
-- `pnpm run lint` fue intentado y falló porque no pudo resolverse `@eslint/js` tras fallar la instalación.
-- `pnpm run test` fue intentado y falló porque el binario `vitest` no está disponible tras fallar la instalación.
-- `pnpm run build` fue intentado y falló porque faltan paquetes de Node, incluyendo React, Tiptap, Vite y Vitest.
-- `pnpm run tauri:build` fue intentado y falló porque el binario `tauri` no está disponible tras fallar la instalación.
+- GitHub Actions CI quedó verde para el flujo web de este PR con Node 22, `pnpm@10.28.1` y el registro público de npm.
+- `pnpm install --no-frozen-lockfile --reporter=append-only` pasó en GitHub Actions; el proyecto todavía no tiene `pnpm-lock.yaml`, por lo que CI usa el fallback sin lockfile hasta que se commitee uno válido.
+- `pnpm run lint` pasó en GitHub Actions.
+- `pnpm run test` pasó en GitHub Actions.
+- `pnpm run build` pasó en GitHub Actions.
+- En el entorno local de Codex, `pnpm install` puede seguir fallando con `ERR_PNPM_FETCH_403` por el proxy del entorno; esa limitación local no cambia el estado verde confirmado en GitHub Actions.
+- `pnpm run tauri:build` sigue pendiente fuera del workflow web actual.
