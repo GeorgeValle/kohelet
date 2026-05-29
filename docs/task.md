@@ -6,7 +6,7 @@
 **Proyecto:** Kohelet  
 **Editor:** Sofer  
 **Estado del documento:** inicial  
-**Última revisión:** 2026-05-28
+**Última revisión:** 2026-05-29
 
 ---
 
@@ -119,8 +119,8 @@ git commit -m "chore: initialize project documentation and Codex skills"
 
 Objetivo: inicializar la app con stack base.
 
-- [~] Inicializar Tauri 2 + React + TypeScript + Vite. Scaffold mínimo creado; validación bloqueada por `pnpm install` sin acceso al registro npm.
-- [~] Configurar `pnpm` como package manager. Scripts agregados; `pnpm-lock.yaml` queda pendiente porque `pnpm install` no pudo resolver dependencias por bloqueo de red.
+- [~] Inicializar Tauri 2 + React + TypeScript + Vite. Scaffold mínimo creado y `bundle.icon` configurado con iconos reales; validación completa bloqueada por `pnpm install` sin acceso al registro npm.
+- [~] Configurar `pnpm` como package manager. Scripts requeridos agregados, incluido `tauri:build`; `pnpm-lock.yaml` queda pendiente porque `pnpm install` no pudo resolver dependencias por bloqueo de red.
 - [x] Crear estructura base de `src/`.
 - [x] Crear `src/styles/tokens.css`.
 - [x] Crear `src/styles/globals.css`.
@@ -132,7 +132,7 @@ Objetivo: inicializar la app con stack base.
 - [x] Crear carga inicial de i18n.
 - [!] Validar `pnpm run build`. Intentado el 2026-05-28; falla porque `pnpm install` no pudo descargar dependencias desde el registro npm.
 - [!] Validar `pnpm run test`. Intentado el 2026-05-28; falla porque `pnpm install` no pudo descargar dependencias desde el registro npm.
-- [ ] Actualizar `docs/phases/phase-01-foundation.md`.
+- [x] Actualizar `docs/phases/phase-01-foundation.md`.
 
 ### 4.1. Primer commit técnico limpio — 2026-05-28
 
@@ -142,6 +142,19 @@ Objetivo: inicializar la app con stack base.
 - [x] Mantener fuera de alcance CI, Tiptap, Sofer completo, storage, exportación y modelos narrativos completos.
 - [!] Ejecutar `pnpm install`. Resultado real: bloqueado por `ERR_PNPM_FETCH_403` al consultar el registro npm desde el entorno; no se pudo generar un `pnpm-lock.yaml` válido.
 - [!] Ejecutar `pnpm run lint`, `pnpm run test` y `pnpm run build`. Resultado real: bloqueados porque `node_modules` no pudo instalarse.
+
+### 4.2. Validación Tauri mínima con iconos reales — 2026-05-29
+
+- [x] Confirmar scaffold Tauri mínimo: `src-tauri/Cargo.toml`, `src-tauri/build.rs`, `src-tauri/src/main.rs`, `src-tauri/tauri.conf.json` y `src-tauri/icons/`.
+- [x] Confirmar iconos reales cargados: `src-tauri/icons/32x32.png`, `src-tauri/icons/128x128.png`, `src-tauri/icons/icon.icns` y `src-tauri/icons/icon.ico`.
+- [x] Actualizar `src-tauri/tauri.conf.json` para que `bundle.icon` apunte solo a iconos reales existentes.
+- [x] Omitir intencionalmente `src-tauri/icons/128x128@2x.png`; no es obligatorio, no fue creado y no debe referenciarse.
+- [x] Agregar script `tauri:build` como `tauri build`.
+- [!] Ejecutar `pnpm install`. Resultado real: bloqueado por `ERR_PNPM_FETCH_403` al consultar `@eslint/js` en el registro npm; no se pudo instalar dependencias ni generar `pnpm-lock.yaml`.
+- [!] Ejecutar `pnpm run lint`. Resultado real: bloqueado porque ESLint no pudo importar `@eslint/js` tras fallar la instalación.
+- [!] Ejecutar `pnpm run test`. Resultado real: bloqueado porque `vitest` no está disponible tras fallar la instalación.
+- [!] Ejecutar `pnpm run build`. Resultado real: bloqueado porque TypeScript no puede resolver React/Vite/Vitest tras fallar la instalación.
+- [!] Ejecutar `pnpm run tauri:build`. Resultado real: bloqueado porque el binario `tauri` no está disponible tras fallar la instalación.
 
 ---
 
