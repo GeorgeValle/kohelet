@@ -1,0 +1,10 @@
+.statusBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-bg-panel);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}

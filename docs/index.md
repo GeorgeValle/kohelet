@@ -198,6 +198,7 @@ docs/storage.md
 docs/export.md
 docs/i18n.md
 docs/testing.md
+docs/dependency-installation.md
 docs/release.md
 docs/glossary.md
 ```
@@ -323,6 +324,17 @@ Leer cuando la tarea implique:
 - tests de exportación;
 - smoke tests;
 - validaciones de i18n.
+
+### `docs/dependency-installation.md`
+
+Registra cómo diagnosticar instalación de dependencias, registry npm/pnpm, proxy/auth y validaciones de CI.
+
+Leer cuando la tarea implique:
+
+- `pnpm install`;
+- errores `ERR_PNPM_FETCH_403`;
+- configuración `.npmrc`;
+- workflows de CI para lint/test/build.
 
 ### `docs/release.md`
 

@@ -119,8 +119,8 @@ git commit -m "chore: initialize project documentation and Codex skills"
 
 Objetivo: inicializar la app con stack base.
 
-- [~] Inicializar Tauri 2 + React + TypeScript + Vite. Scaffold mínimo creado y `bundle.icon` configurado con iconos reales; validación completa bloqueada por `pnpm install` sin acceso al registro npm.
-- [~] Configurar `pnpm` como package manager. Scripts requeridos agregados, incluido `tauri:build`; `pnpm-lock.yaml` queda pendiente porque `pnpm install` no pudo resolver dependencias por bloqueo de red.
+- [~] Inicializar Tauri 2 + React + TypeScript + Vite. Scaffold mínimo creado y `bundle.icon` configurado con iconos reales; validación web pasó en GitHub Actions, mientras que la validación Tauri de escritorio sigue pendiente.
+- [~] Configurar `pnpm` como package manager. Scripts requeridos agregados, incluido `tauri:build`; `package.json` declara nuevamente el `packageManager` real usado por el PR (`pnpm@10.28.1`) y GitHub Actions instaló dependencias con esa versión, pero `pnpm-lock.yaml` sigue pendiente porque no debe generarse desde el entorno local bloqueado.
 - [x] Crear estructura base de `src/`.
 - [x] Crear `src/styles/tokens.css`.
 - [x] Crear `src/styles/globals.css`.
@@ -130,8 +130,8 @@ Objetivo: inicializar la app con stack base.
 - [x] Configurar lint si aplica.
 - [x] Crear `src/i18n/locales/es-AR.json`.
 - [x] Crear carga inicial de i18n.
-- [!] Validar `pnpm run build`. Intentado el 2026-05-28; falla porque `pnpm install` no pudo descargar dependencias desde el registro npm.
-- [!] Validar `pnpm run test`. Intentado el 2026-05-28; falla porque `pnpm install` no pudo descargar dependencias desde el registro npm.
+- [x] Validar `pnpm run build`. Resultado real: pasó en GitHub Actions.
+- [x] Validar `pnpm run test`. Resultado real: pasó en GitHub Actions.
 - [x] Actualizar `docs/phases/phase-01-foundation.md`.
 
 ### 4.1. Primer commit técnico limpio — 2026-05-28
@@ -140,8 +140,8 @@ Objetivo: inicializar la app con stack base.
 - [x] Crear scaffold Tauri 2 mínimo sin iconos reales y con `bundle.icon` vacío.
 - [x] Crear `src-tauri/icons/.gitkeep`.
 - [x] Mantener fuera de alcance CI, Tiptap, Sofer completo, storage, exportación y modelos narrativos completos.
-- [!] Ejecutar `pnpm install`. Resultado real: bloqueado por `ERR_PNPM_FETCH_403` al consultar el registro npm desde el entorno; no se pudo generar un `pnpm-lock.yaml` válido.
-- [!] Ejecutar `pnpm run lint`, `pnpm run test` y `pnpm run build`. Resultado real: bloqueados porque `node_modules` no pudo instalarse.
+- [x] Ejecutar `pnpm install`. Resultado real: pasó en GitHub Actions con `--no-frozen-lockfile`; el entorno local de Codex sigue bloqueado por `ERR_PNPM_FETCH_403` y no se generó un `pnpm-lock.yaml` válido.
+- [x] Ejecutar `pnpm run lint`, `pnpm run test` y `pnpm run build`. Resultado real: pasaron en GitHub Actions.
 
 ### 4.2. Validación Tauri mínima con iconos reales — 2026-05-29
 
@@ -150,11 +150,19 @@ Objetivo: inicializar la app con stack base.
 - [x] Actualizar `src-tauri/tauri.conf.json` para que `bundle.icon` apunte solo a iconos reales existentes.
 - [x] Omitir intencionalmente `src-tauri/icons/128x128@2x.png`; no es obligatorio, no fue creado y no debe referenciarse.
 - [x] Agregar script `tauri:build` como `tauri build`.
-- [!] Ejecutar `pnpm install`. Resultado real: bloqueado por `ERR_PNPM_FETCH_403` al consultar `@eslint/js` en el registro npm; no se pudo instalar dependencias ni generar `pnpm-lock.yaml`.
-- [!] Ejecutar `pnpm run lint`. Resultado real: bloqueado porque ESLint no pudo importar `@eslint/js` tras fallar la instalación.
-- [!] Ejecutar `pnpm run test`. Resultado real: bloqueado porque `vitest` no está disponible tras fallar la instalación.
-- [!] Ejecutar `pnpm run build`. Resultado real: bloqueado porque TypeScript no puede resolver React/Vite/Vitest tras fallar la instalación.
-- [!] Ejecutar `pnpm run tauri:build`. Resultado real: bloqueado porque el binario `tauri` no está disponible tras fallar la instalación.
+- [x] Ejecutar `pnpm install --no-frozen-lockfile --reporter=append-only` en GitHub Actions. Resultado real: pasó en CI con `pnpm@10.28.1` y registro público de npm; el entorno local de Codex siguió bloqueado por `ERR_PNPM_FETCH_403`, por lo que no se generó `pnpm-lock.yaml` localmente.
+- [x] Ejecutar `pnpm run lint` en GitHub Actions. Resultado real: pasó en CI.
+- [x] Ejecutar `pnpm run test` en GitHub Actions. Resultado real: pasó en CI.
+- [x] Ejecutar `pnpm run build` en GitHub Actions. Resultado real: pasó en CI.
+- [!] Ejecutar `pnpm run tauri:build`. Resultado real local: bloqueado porque el binario `tauri` no está disponible tras fallar la instalación local; no forma parte del workflow web actual.
+- [x] Investigar instalación de dependencias: no hay `pnpm-lock.yaml`, el registro efectivo es `https://registry.npmjs.org/`, el entorno local de Codex devuelve 403 desde el proxy configurado antes de llegar al registro npm, y GitHub Actions sí pudo instalar dependencias desde el registro público.
+- [x] Agregar `.npmrc` explícito para usar npm público sin tokens de autenticación del proyecto, con `always-auth=false`, `auto-install-peers=true` y `strict-peer-dependencies=false`.
+- [x] Revertir `packageManager` a la versión real usada por `package.json`, `pnpm@10.28.1`, para mantener la línea base previa y separar cualquier cambio mayor de pnpm del PR de Sofer.
+- [x] Simplificar `.github/workflows/ci.yml` como único workflow de CI con Node 22, diagnóstico mínimo de entorno, instalación pnpm con fallback sin lockfile y validaciones `lint`, `test` y `build`.
+- [x] Mantener un único workflow `.github/workflows/ci.yml` para diagnosticar configuración de registry e instalación con pnpm 10 desde GitHub Actions, sin `cache: pnpm` hasta commitear `pnpm-lock.yaml`.
+- [x] Confirmar GitHub Actions CI verde para `pnpm install --no-frozen-lockfile --reporter=append-only`, `pnpm run lint`, `pnpm run test` y `pnpm run build`.
+- [x] Documentar diagnóstico de instalación en `docs/dependency-installation.md`.
+- [ ] Generar y commitear `pnpm-lock.yaml` desde un entorno con acceso válido al registro npm; CI usará `--frozen-lockfile` cuando exista.
 
 ---
 
@@ -162,21 +170,21 @@ Objetivo: inicializar la app con stack base.
 
 Objetivo: crear el editor base de escritura por escena.
 
-- [ ] Instalar y configurar Tiptap.
-- [ ] Crear `RichTextEditor.tsx`.
-- [ ] Crear `RichTextEditor.module.css`.
-- [ ] Crear `RichTextToolbar.tsx`.
-- [ ] Crear `RichTextToolbar.module.css`.
-- [ ] Crear `EditorShell.tsx`.
-- [ ] Crear `EditorStatusBar.tsx`.
-- [ ] Definir extensiones iniciales del editor.
-- [ ] Crear comandos desacoplados en `lib/editor/`.
-- [ ] Guardar contenido como JSON estructurado.
+- [x] Instalar y configurar Tiptap. Dependencias declaradas; instalación validada en GitHub Actions, aunque el entorno local de Codex sigue bloqueado por `ERR_PNPM_FETCH_403`.
+- [x] Crear `RichTextEditor.tsx`.
+- [x] Crear `RichTextEditor.module.css`.
+- [x] Crear `RichTextToolbar.tsx`.
+- [x] Crear `RichTextToolbar.module.css`.
+- [x] Crear `EditorShell.tsx`.
+- [x] Crear `EditorStatusBar.tsx`.
+- [x] Definir extensiones iniciales del editor.
+- [x] Crear comandos desacoplados en `lib/editor/`.
+- [x] Tratar contenido como JSON estructurado con helpers mínimos; storage real sigue fuera de alcance.
 - [ ] Preservar cursor y selección al abrir/cerrar paneles.
-- [ ] Evitar toolbar tipo Word completa.
-- [ ] Crear tests mínimos del editor.
-- [ ] Actualizar `docs/editor-core.md`.
-- [ ] Actualizar `docs/phases/phase-02-editor-core.md`.
+- [x] Evitar toolbar tipo Word completa.
+- [x] Crear tests mínimos del editor.
+- [x] Actualizar `docs/editor-core.md`.
+- [x] Actualizar `docs/phases/phase-02-editor-core.md`.
 
 ---
 
@@ -212,8 +220,8 @@ StoryWorld → Work → Part → Chapter → Scene
 
 Objetivo: permitir escritura concentrada y consulta contextual temporal.
 
-- [ ] Crear `WritingWorkspace.tsx`.
-- [ ] Crear `WritingWorkspace.module.css`.
+- [x] Crear `WritingWorkspace.tsx`.
+- [x] Crear `WritingWorkspace.module.css`.
 - [ ] Crear `ContextualLayout.tsx`.
 - [ ] Crear `ContextualLayout.module.css`.
 - [ ] Implementar modo concentración.
@@ -222,7 +230,7 @@ Objetivo: permitir escritura concentrada y consulta contextual temporal.
 - [ ] Crear panel izquierdo de árbol narrativo.
 - [ ] Permitir ocultar paneles.
 - [ ] Mantener editor montado al abrir/cerrar contexto.
-- [ ] Usar tokens de `tokens.css`.
+- [x] Usar tokens de `tokens.css`.
 - [ ] Usar CSS Modules para componentes.
 - [ ] Actualizar `DESIGN.md` si cambia el comportamiento visual.
 - [ ] Actualizar `docs/phases/phase-03-narrative-structure.md` o crear nota en fase correspondiente.

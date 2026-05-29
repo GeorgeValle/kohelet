@@ -1,11 +1,10 @@
 import esAR from './locales/es-AR.json';
 
-type LocaleDictionary = typeof esAR;
-type TranslationKey = 'app.shellLabel' | 'app.editorName' | 'app.tagline' | 'app.foundationStatus';
+type TranslationParams = Record<string, string | number>;
 
-const dictionary: LocaleDictionary = esAR;
+const dictionary = esAR;
 
-export function t(key: TranslationKey): string {
+export function t(key: string, params: TranslationParams = {}): string {
   const value = key.split('.').reduce<unknown>((current, segment) => {
     if (typeof current !== 'object' || current === null || !(segment in current)) {
       return undefined;
@@ -18,5 +17,8 @@ export function t(key: TranslationKey): string {
     throw new Error(`Missing translation key: ${key}`);
   }
 
-  return value;
+  return Object.entries(params).reduce(
+    (translation, [paramName, paramValue]) => translation.replaceAll(`{${paramName}}`, String(paramValue)),
+    value,
+  );
 }

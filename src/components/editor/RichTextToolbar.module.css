@@ -1,0 +1,51 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-bg-panel);
+}
+
+.group {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.group + .group {
+  padding-inline-start: var(--space-sm);
+  border-inline-start: 1px solid var(--color-border-subtle);
+}
+
+.button {
+  min-height: 2.25rem;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled),
+.button:focus-visible {
+  color: var(--color-text-primary);
+  border-color: var(--color-text-muted);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-text-muted);
+  outline-offset: 2px;
+}
+
+.button[aria-pressed='true'] {
+  background: var(--color-bg-app);
+  color: var(--color-text-primary);
+  border-color: var(--color-text-muted);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
