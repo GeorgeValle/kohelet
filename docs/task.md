@@ -150,16 +150,16 @@ Objetivo: inicializar la app con stack base.
 - [x] Actualizar `src-tauri/tauri.conf.json` para que `bundle.icon` apunte solo a iconos reales existentes.
 - [x] Omitir intencionalmente `src-tauri/icons/128x128@2x.png`; no es obligatorio, no fue creado y no debe referenciarse.
 - [x] Agregar script `tauri:build` como `tauri build`.
-- [!] Ejecutar `pnpm install`. Resultado real: bloqueado por `ERR_PNPM_FETCH_403` al consultar `@eslint/js` en el registro npm; no se pudo instalar dependencias ni generar `pnpm-lock.yaml`.
+- [!] Ejecutar `pnpm install --no-frozen-lockfile --reporter=append-only`. Resultado real local: bloqueado por `ERR_PNPM_FETCH_403` al consultar dependencias directas en `https://registry.npmjs.org/`; en la última corrida falló `@tauri-apps/cli`, no se pudo instalar dependencias ni generar `pnpm-lock.yaml`.
 - [!] Ejecutar `pnpm run lint`. Resultado real: bloqueado porque ESLint no pudo importar `@eslint/js` tras fallar la instalación.
 - [!] Ejecutar `pnpm run test`. Resultado real: bloqueado porque `vitest` no está disponible tras fallar la instalación.
 - [!] Ejecutar `pnpm run build`. Resultado real: bloqueado porque TypeScript no puede resolver React/Vite/Vitest tras fallar la instalación.
 - [!] Ejecutar `pnpm run tauri:build`. Resultado real: bloqueado porque el binario `tauri` no está disponible tras fallar la instalación.
 - [x] Investigar instalación de dependencias: no hay `.npmrc`, no hay `pnpm-lock.yaml` y no había workflow CI; el registro efectivo era `https://registry.npmjs.org/`, pero el entorno local devolvió 403 desde el proxy configurado antes de llegar al registro npm.
 - [x] Agregar `.npmrc` explícito para usar npm público sin tokens de autenticación del proyecto, con `always-auth=false`, `auto-install-peers=true` y `strict-peer-dependencies=false`.
-- [x] Actualizar `packageManager` a `pnpm@11.1.2` como fuente única de versión de pnpm. Resultado local real: Corepack intentó descargar `https://registry.npmjs.org/pnpm/-/pnpm-11.1.2.tgz`, pero el proxy del entorno devolvió 403 antes de completar la descarga.
-- [x] Agregar workflow `.github/workflows/ci.yml` con diagnóstico de registry, instalación pnpm y validaciones `lint`, `test` y `build`.
-- [x] Mantener un único workflow `.github/workflows/ci.yml` para diagnosticar configuración de registry e instalación con pnpm 11 desde GitHub Actions.
+- [x] Revertir `packageManager` a `pnpm@10.28.1` para mantener la línea base previa y separar el cambio de versión de pnpm del PR de Sofer.
+- [x] Simplificar `.github/workflows/ci.yml` como único workflow de CI con Node 22, diagnóstico mínimo de entorno, instalación pnpm con fallback sin lockfile y validaciones `lint`, `test` y `build`.
+- [x] Mantener un único workflow `.github/workflows/ci.yml` para diagnosticar configuración de registry e instalación con pnpm 10 desde GitHub Actions, sin `cache: pnpm` hasta commitear `pnpm-lock.yaml`.
 - [x] Documentar diagnóstico de instalación en `docs/dependency-installation.md`.
 - [ ] Generar y commitear `pnpm-lock.yaml` desde un entorno con acceso válido al registro npm; CI usará `--frozen-lockfile` cuando exista.
 

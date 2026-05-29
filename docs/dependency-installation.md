@@ -4,7 +4,7 @@
 
 ## Configuración actual
 
-- El proyecto usa `pnpm@11.1.2`, declarado en `package.json` mediante `packageManager`.
+- El proyecto usa `pnpm@10.28.1`, declarado en `package.json` mediante `packageManager`.
 - El repositorio fija el registro público de npm en `.npmrc` y no define tokens de autenticación, para evitar que paquetes públicos se resuelvan por accidente contra un registro privado o credenciales de GitHub Packages.
 - El repositorio todavía no tiene `pnpm-lock.yaml` commiteado. Hasta que exista un lockfile, CI instala con `pnpm install --no-frozen-lockfile`; cuando el lockfile exista, CI cambia automáticamente a `pnpm install --frozen-lockfile`.
 
@@ -29,7 +29,7 @@ Si el registro es correcto pero los requests fallan con `ERR_PNPM_FETCH_403`, re
 
 ## Validación en CI
 
-GitHub Actions ejecuta `.github/workflows/ci.yml` en pull requests y pushes a `main`:
+GitHub Actions ejecuta un único workflow, `.github/workflows/ci.yml`, en pull requests y pushes a `main`:
 
 ```bash
 pnpm run lint
@@ -37,4 +37,4 @@ pnpm run test
 pnpm run build
 ```
 
-El workflow imprime diagnósticos de registry antes de instalar dependencias para que problemas de registry, proxy o auth queden visibles en el log del job.
+El workflow imprime versiones de Node/pnpm, registry y variables de proxy antes de instalar dependencias para que problemas de registry, proxy o auth queden visibles en el log del job. Mientras no exista `pnpm-lock.yaml`, no usa cache de pnpm y ejecuta `pnpm install --no-frozen-lockfile --reporter=append-only`.
