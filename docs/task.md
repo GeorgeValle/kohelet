@@ -156,8 +156,10 @@ Objetivo: inicializar la app con stack base.
 - [!] Ejecutar `pnpm run build`. Resultado real: bloqueado porque TypeScript no puede resolver React/Vite/Vitest tras fallar la instalación.
 - [!] Ejecutar `pnpm run tauri:build`. Resultado real: bloqueado porque el binario `tauri` no está disponible tras fallar la instalación.
 - [x] Investigar instalación de dependencias: no hay `.npmrc`, no hay `pnpm-lock.yaml` y no había workflow CI; el registro efectivo era `https://registry.npmjs.org/`, pero el entorno local devolvió 403 desde el proxy configurado antes de llegar al registro npm.
-- [x] Agregar `.npmrc` explícito para usar npm público sin tokens de autenticación del proyecto.
+- [x] Agregar `.npmrc` explícito para usar npm público sin tokens de autenticación del proyecto, con `always-auth=false`, `auto-install-peers=true` y `strict-peer-dependencies=false`.
+- [x] Actualizar `packageManager` a `pnpm@11.1.2` como fuente única de versión de pnpm. Resultado local real: Corepack intentó descargar `https://registry.npmjs.org/pnpm/-/pnpm-11.1.2.tgz`, pero el proxy del entorno devolvió 403 antes de completar la descarga.
 - [x] Agregar workflow `.github/workflows/ci.yml` con diagnóstico de registry, instalación pnpm y validaciones `lint`, `test` y `build`.
+- [x] Agregar workflow temporal `.github/workflows/dependency-check.yml` para diagnosticar configuración de registry e instalación con pnpm 11 desde GitHub Actions; queda pendiente revisar el resultado real del runner.
 - [x] Documentar diagnóstico de instalación en `docs/dependency-installation.md`.
 - [ ] Generar y commitear `pnpm-lock.yaml` desde un entorno con acceso válido al registro npm; CI usará `--frozen-lockfile` cuando exista.
 

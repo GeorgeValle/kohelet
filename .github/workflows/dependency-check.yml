@@ -1,19 +1,15 @@
-name: CI
+name: dependency-check
 
 on:
   pull_request:
   push:
-    branches:
-      - main
 
 jobs:
-  validate:
-    name: Validate web app
+  dependency-check:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Enable Corepack
         run: corepack enable
@@ -21,13 +17,13 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
 
-      - name: Print registry diagnostics
+      - name: Show registry config
         run: |
           pnpm config get registry
           npm config get registry
@@ -35,13 +31,7 @@ jobs:
           npm config list
 
       - name: Install dependencies
-        run: |
-          if [ -f pnpm-lock.yaml ]; then
-            pnpm install --frozen-lockfile
-          else
-            echo "pnpm-lock.yaml is missing; installing with --no-frozen-lockfile until the lockfile is committed."
-            pnpm install --no-frozen-lockfile
-          fi
+        run: pnpm install --no-frozen-lockfile
 
       - name: Lint
         run: pnpm run lint
