@@ -171,7 +171,8 @@ Objetivo: inicializar la app con stack base.
 - [x] Confirmar `.github/workflows/ci.yml` con Node 22, `pnpm/action-setup@v4`, sin `cache: pnpm` mientras no exista `pnpm-lock.yaml`, instalación condicional según lockfile y validaciones `lint`, `test` y `build`.
 - [x] Registrar que CI web pasó en GitHub Actions para `pnpm install --no-frozen-lockfile --reporter=append-only`, `pnpm run lint`, `pnpm run test` y `pnpm run build`.
 - [!] Intentar `pnpm install` en Codex Cloud. Resultado real local: falló con `ERR_PNPM_FETCH_403`; no se generó `pnpm-lock.yaml` y no se fuerza desde este entorno.
-- [ ] Generar y commitear `pnpm-lock.yaml` desde un entorno con acceso válido a npm; después, cambiar CI a `--frozen-lockfile` fijo y habilitar `cache: pnpm`.
+- [x] Crear workflow manual `Generate pnpm lockfile` para generar `pnpm-lock.yaml` desde GitHub Actions con Node 22, pnpm 10 y una PR automática dedicada.
+- [ ] Ejecutar el workflow manual para generar y commitear `pnpm-lock.yaml`; después, cambiar CI a `--frozen-lockfile` fijo y habilitar `cache: pnpm` en una PR posterior.
 - [!] Ejecutar `pnpm run tauri:build`. Sigue pendiente porque no forma parte del workflow web validado y la instalación local quedó bloqueada por `ERR_PNPM_FETCH_403`.
 
 ---
