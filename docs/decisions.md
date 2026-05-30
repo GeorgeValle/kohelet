@@ -598,7 +598,7 @@ Permite instrucciones especializadas por tipo de tarea.
 
 ### Contexto
 
-PR #4 dejó el flujo web de GitHub Actions en verde con el primer editor mínimo Sofer, pero el repositorio todavía no tiene `pnpm-lock.yaml` y el entorno de Codex Cloud puede fallar al instalar dependencias con `ERR_PNPM_FETCH_403`.
+PR #4 dejó el flujo web de GitHub Actions en verde con el primer editor mínimo Sofer cuando el repositorio todavía no tenía `pnpm-lock.yaml` y el entorno de Codex Cloud podía fallar al instalar dependencias con `ERR_PNPM_FETCH_403`. Después, `pnpm-lock.yaml` fue generado y mergeado en `main`, por lo que CI puede endurecerse con lockfile congelado.
 
 ### Decisión
 
@@ -606,8 +606,8 @@ PR #4 dejó el flujo web de GitHub Actions en verde con el primer editor mínimo
 - Use Node 22 in GitHub Actions.
 - Keep the npm public registry explicit through `.npmrc`.
 - Do not use GitHub Packages or auth tokens unless private packages are introduced.
-- Keep `pnpm install --no-frozen-lockfile` only while `pnpm-lock.yaml` is absent.
-- Switch to `--frozen-lockfile` and enable pnpm cache once `pnpm-lock.yaml` is committed.
+- Use `pnpm install --frozen-lockfile --reporter=append-only` in CI now that `pnpm-lock.yaml` is committed.
+- Keep pnpm cache enabled in `actions/setup-node@v4` because the lockfile is stable.
 - Treat Codex Cloud `ERR_PNPM_FETCH_403` as an environment/proxy limitation when GitHub Actions validates successfully.
 
 ### Motivo
@@ -616,11 +616,13 @@ La instalación debe ser reproducible y fácil de diagnosticar sin introducir cr
 
 ### Consecuencias
 
-- CI mantiene el fallback `--no-frozen-lockfile` solo hasta que exista `pnpm-lock.yaml`.
-- `cache: pnpm` permanece deshabilitado hasta que el lockfile esté commiteado.
+- CI usa `pnpm install --frozen-lockfile --reporter=append-only` siempre y falla si `package.json` y `pnpm-lock.yaml` divergen.
+- `cache: pnpm` queda habilitado porque el lockfile ya está commiteado.
 - Un 403 de Codex Cloud no debe resolverse cambiando features, Tiptap, Sofer, UI, storage, exportación o modelos narrativos.
 
 ### Seguimiento
 
-- Generar y commitear `pnpm-lock.yaml` desde un entorno con acceso válido a npm.
-- Después del lockfile, simplificar CI a `pnpm install --frozen-lockfile --reporter=append-only` y habilitar `cache: pnpm`.
+- [x] `pnpm-lock.yaml` fue generado y mergeado en `main`.
+- [x] CI quedó simplificado a `pnpm install --frozen-lockfile --reporter=append-only` y `actions/setup-node@v4` quedó con `cache: pnpm`.
+- [x] El workflow manual `Generate pnpm lockfile` se mantiene como herramienta para regenerar el lockfile cuando cambien dependencias.
+- [ ] Si se cambian dependencias, actualizar `package.json` y `pnpm-lock.yaml` de forma consistente; CI debe fallar cuando diverjan.

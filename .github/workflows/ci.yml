@@ -25,6 +25,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
 
       - name: Show environment
         run: |
@@ -35,13 +36,7 @@ jobs:
           env | grep -i proxy || true
 
       - name: Install dependencies
-        run: |
-          if [ -f pnpm-lock.yaml ]; then
-            pnpm install --frozen-lockfile --reporter=append-only
-          else
-            echo "pnpm-lock.yaml is missing; installing with --no-frozen-lockfile until the lockfile is committed."
-            pnpm install --no-frozen-lockfile --reporter=append-only
-          fi
+        run: pnpm install --frozen-lockfile --reporter=append-only
 
       - name: Lint
         run: pnpm run lint
