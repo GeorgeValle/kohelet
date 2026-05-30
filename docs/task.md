@@ -309,6 +309,47 @@ Objetivo: proteger el texto del escritor.
 - [ ] Actualizar `docs/storage.md`.
 - [ ] Actualizar `docs/phases/phase-05-storage-recovery.md`.
 
+### 9.1. Próximo bloque planificado — storage local seguro inicial
+
+Objetivo: dejar lista la siguiente PR para implementar el primer guardado local manual sin perder texto ni acoplar storage al editor.
+
+Estado auditado al 2026-05-30:
+
+- [x] Confirmar que Sofer actual edita una escena mock en memoria con Tiptap y JSON estructurado mínimo.
+- [x] Confirmar que todavía no existen tipos implementados de `StoryWorld`, `Work`, `Part`, `Chapter`, `Scene` ni `KoheletProjectFile` en `src/`.
+- [x] Confirmar que todavía no existe `src/lib/storage/`, `projectStorage`, autosave, snapshots, recovery ni migraciones.
+- [x] Confirmar que los tests relevantes actuales cubren app/workspace, serialización mínima del editor y conteo de palabras, pero no storage.
+
+Checklist para la próxima PR de implementación:
+
+- [ ] Crear tipos mínimos de dominio compatibles con `docs/data-model.md`.
+- [ ] Crear `KoheletProjectFile` schema versionado con `app: 'kohelet'`, `schemaVersion: 1`, `savedAt` y `storyWorld`.
+- [ ] Usar extensión `.kohelet` para archivos de proyecto locales.
+- [ ] Crear `src/lib/storage/projectFileFormat.ts` para serialización JSON inicial.
+- [ ] Crear `src/lib/storage/projectValidation.ts` con validaciones mínimas de integridad.
+- [ ] Crear `src/lib/storage/storageErrors.ts` con categorías tipadas.
+- [ ] Crear `src/lib/storage/migrations.ts` con rechazo claro de versiones futuras y stub para migraciones.
+- [ ] Crear `src/lib/storage/projectStorage.ts` para `openProject` y `saveProject`.
+- [ ] Definir boundary Tauri pequeño para filesystem sin lógica de rutas en componentes React.
+- [ ] Implementar guardado manual inicial con escritura temporal y reemplazo seguro, o documentar alternativa equivalente.
+- [ ] Mantener `Scene.content` como JSON estructurado serializable compatible con Sofer.
+- [ ] No usar `localStorage` como fuente principal del manuscrito.
+- [ ] No interceptar la X nativa de la ventana en este bloque.
+- [ ] Dejar autosave, snapshots y recovery como APIs/puntos de extensión separados, sin implementar flujo completo todavía.
+- [ ] Agregar tests unitarios para validación, roundtrip de `Scene.content` y errores tipados.
+- [ ] Si se toca UI de guardado, agregar textos visibles en `src/i18n/locales/es-AR.json`.
+- [ ] Actualizar `docs/storage.md`, `docs/task.md` y `docs/phases/phase-05-storage-recovery.md` al cerrar la implementación.
+
+Fuera de alcance de la próxima PR:
+
+- [ ] Cloud sync.
+- [ ] Colaboración multiusuario.
+- [ ] IA.
+- [ ] Exportación avanzada o RTF.
+- [ ] Recovery UI completo.
+- [ ] Snapshots periódicos completos.
+- [ ] Adjuntos pesados.
+
 ---
 
 ## 10. Fase 7 — Exportación
