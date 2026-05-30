@@ -219,14 +219,14 @@ Jerarquía máxima:
 StoryWorld → Work → Part → Chapter → Scene
 ```
 
-- [ ] Crear tipos de `StoryWorld`.
-- [ ] Crear tipos de `Work`.
-- [ ] Crear tipos de `Part`.
-- [ ] Crear tipos de `Chapter`.
-- [ ] Crear tipos de `Scene`.
-- [ ] Crear `NarrativeCore`.
-- [ ] Crear `SceneType`.
-- [ ] Crear `SceneStatus`.
+- [x] Crear tipos de `StoryWorld`.
+- [x] Crear tipos de `Work`.
+- [x] Crear tipos de `Part`.
+- [x] Crear tipos de `Chapter`.
+- [x] Crear tipos de `Scene`.
+- [x] Crear `NarrativeCore`.
+- [x] Crear `SceneType`.
+- [x] Crear `SceneStatus`.
 - [ ] Crear validaciones básicas del modelo.
 - [ ] Crear árbol narrativo inicial.
 - [ ] Permitir estructura para cuento corto.
@@ -296,18 +296,18 @@ Objetivo: crear módulos conectados a escenas, obras y mundo narrativo.
 
 Objetivo: proteger el texto del escritor.
 
-- [ ] Crear estructura de proyecto local.
+- [x] Crear estructura de proyecto local.
 - [ ] Crear guardado local.
-- [ ] Crear apertura de proyecto local.
+- [x] Crear apertura de proyecto local desde texto `.kohelet` validado.
 - [ ] Implementar autoguardado configurable.
 - [ ] Implementar snapshots periódicos.
 - [ ] Implementar recuperación ante cierre inesperado.
 - [ ] Crear indicador `Guardado / Sin guardar`.
-- [ ] Crear validación básica de integridad.
-- [ ] Preparar migraciones de estructura.
-- [ ] Evitar `localStorage` como almacenamiento principal del manuscrito.
-- [ ] Actualizar `docs/storage.md`.
-- [ ] Actualizar `docs/phases/phase-05-storage-recovery.md`.
+- [x] Crear validación básica de integridad.
+- [x] Preparar migraciones de estructura.
+- [x] Evitar `localStorage` como almacenamiento principal del manuscrito.
+- [x] Actualizar `docs/storage.md`.
+- [x] Actualizar `docs/phases/phase-05-storage-recovery.md`.
 
 ### 9.1. Próximo bloque planificado — storage local seguro inicial
 
@@ -322,23 +322,23 @@ Estado auditado al 2026-05-30:
 
 Checklist para la próxima PR de implementación:
 
-- [ ] Crear tipos mínimos de dominio compatibles con `docs/data-model.md`.
-- [ ] Crear `KoheletProjectFile` schema versionado con `app: 'kohelet'`, `schemaVersion: 1`, `savedAt` y `storyWorld`.
-- [ ] Usar extensión `.kohelet` para archivos de proyecto locales.
-- [ ] Crear `src/lib/storage/projectFileFormat.ts` para serialización JSON inicial.
-- [ ] Crear `src/lib/storage/projectValidation.ts` con validaciones mínimas de integridad.
-- [ ] Crear `src/lib/storage/storageErrors.ts` con categorías tipadas.
-- [ ] Crear `src/lib/storage/migrations.ts` con rechazo claro de versiones futuras y stub para migraciones.
-- [ ] Crear `src/lib/storage/projectStorage.ts` para `openProject` y `saveProject`.
-- [ ] Definir boundary Tauri pequeño para filesystem sin lógica de rutas en componentes React.
-- [ ] Implementar guardado manual inicial con escritura temporal y reemplazo seguro, o documentar alternativa equivalente.
-- [ ] Mantener `Scene.content` como JSON estructurado serializable compatible con Sofer.
-- [ ] No usar `localStorage` como fuente principal del manuscrito.
-- [ ] No interceptar la X nativa de la ventana en este bloque.
-- [ ] Dejar autosave, snapshots y recovery como APIs/puntos de extensión separados, sin implementar flujo completo todavía.
-- [ ] Agregar tests unitarios para validación, roundtrip de `Scene.content` y errores tipados.
+- [x] Crear tipos mínimos de dominio compatibles con `docs/data-model.md`.
+- [x] Crear `KoheletProjectFile` schema versionado con `app: 'kohelet'`, `schemaVersion: 1`, `savedAt` y `storyWorld`.
+- [x] Usar extensión `.kohelet` para archivos de proyecto locales.
+- [x] Crear `src/lib/storage/projectFileFormat.ts` para serialización JSON inicial.
+- [x] Crear `src/lib/storage/projectValidation.ts` con validaciones mínimas de integridad.
+- [x] Crear `src/lib/storage/storageErrors.ts` con categorías tipadas.
+- [x] Crear `src/lib/storage/migrations.ts` con rechazo claro de versiones futuras y stub para migraciones.
+- [x] Crear `src/lib/storage/projectStorage.ts` para apertura desde texto, preparación de guardado y boundary de escritura inyectado.
+- [x] Definir boundary de escritura inyectado sin lógica de rutas en componentes React; Tauri real queda para el siguiente corte.
+- [~] Implementar guardado manual inicial con escritura temporal y reemplazo seguro, o documentar alternativa equivalente. En este corte se documenta y testea el boundary puro; falta conectar filesystem Tauri seguro.
+- [x] Mantener `Scene.content` como JSON estructurado serializable compatible con Sofer.
+- [x] No usar `localStorage` como fuente principal del manuscrito.
+- [x] No interceptar la X nativa de la ventana en este bloque.
+- [x] Dejar autosave, snapshots y recovery como puntos de extensión separados, sin implementar flujo completo todavía.
+- [x] Agregar tests unitarios para validación, roundtrip de `Scene.content` y errores tipados.
 - [ ] Si se toca UI de guardado, agregar textos visibles en `src/i18n/locales/es-AR.json`.
-- [ ] Actualizar `docs/storage.md`, `docs/task.md` y `docs/phases/phase-05-storage-recovery.md` al cerrar la implementación.
+- [x] Actualizar `docs/storage.md`, `docs/task.md` y `docs/phases/phase-05-storage-recovery.md` al cerrar la implementación.
 
 Fuera de alcance de la próxima PR:
 
@@ -435,7 +435,7 @@ Registrar acá temas que aún requieren decisión.
 
 - [ ] Nombre definitivo de la licencia.
 - [ ] Profundidad inicial del módulo de continuidad.
-- [ ] Formato exacto del archivo local del proyecto.
+- [x] Formato exacto del archivo local del proyecto: JSON legible con extensión `.kohelet`, `app: 'kohelet'` y `schemaVersion: 1`.
 - [ ] Alcance final de objetivos de palabras para 1.0.
 - [ ] Exportación TXT opcional.
 - [ ] Convención final de nombres de rutas/componentes.
