@@ -6,7 +6,7 @@
 **Proyecto:** Kohelet  
 **Editor:** Sofer  
 **Estado del documento:** inicial  
-**Última revisión:** 2026-05-29
+**Última revisión:** 2026-05-30
 
 ---
 
@@ -120,7 +120,7 @@ git commit -m "chore: initialize project documentation and Codex skills"
 Objetivo: inicializar la app con stack base.
 
 - [~] Inicializar Tauri 2 + React + TypeScript + Vite. Scaffold mínimo creado y `bundle.icon` configurado con iconos reales; validación web pasó en GitHub Actions, mientras que la validación Tauri de escritorio sigue pendiente.
-- [~] Configurar `pnpm` como package manager. Scripts requeridos agregados, incluido `tauri:build`; `package.json` declara nuevamente el `packageManager` real usado por el PR (`pnpm@10.28.1`) y GitHub Actions instaló dependencias con esa versión, pero `pnpm-lock.yaml` sigue pendiente porque no debe generarse desde el entorno local bloqueado.
+- [x] Configurar `pnpm` como package manager. Scripts requeridos agregados, incluido `tauri:build`; `package.json` declara el `packageManager` real usado por el proyecto (`pnpm@10.28.1`), `pnpm-lock.yaml` ya fue generado y mergeado, y CI instala con lockfile congelado.
 - [x] Crear estructura base de `src/`.
 - [x] Crear `src/styles/tokens.css`.
 - [x] Crear `src/styles/globals.css`.
@@ -162,18 +162,28 @@ Objetivo: inicializar la app con stack base.
 - [x] Mantener un único workflow `.github/workflows/ci.yml` para diagnosticar configuración de registry e instalación con pnpm 10 desde GitHub Actions, sin `cache: pnpm` hasta commitear `pnpm-lock.yaml`.
 - [x] Confirmar GitHub Actions CI verde para `pnpm install --no-frozen-lockfile --reporter=append-only`, `pnpm run lint`, `pnpm run test` y `pnpm run build`.
 - [x] Documentar diagnóstico de instalación en `docs/dependency-installation.md`.
-- [ ] Generar y commitear `pnpm-lock.yaml` desde un entorno con acceso válido al registro npm; CI usará `--frozen-lockfile` cuando exista.
+- [x] Generar y commitear `pnpm-lock.yaml` desde un entorno con acceso válido al registro npm; CI ahora usa `--frozen-lockfile` fijo.
 
 ### 4.3. Línea base formal de instalación — 2026-05-29
 
 - [x] Confirmar `packageManager` como `pnpm@10.28.1`; no se actualiza a pnpm 11 en esta deuda técnica.
 - [x] Confirmar `.npmrc` con registro público de npm, `always-auth=false`, `auto-install-peers=true` y `strict-peer-dependencies=false`, sin GitHub Packages ni tokens.
-- [x] Confirmar `.github/workflows/ci.yml` con Node 22, `pnpm/action-setup@v4`, sin `cache: pnpm` mientras no exista `pnpm-lock.yaml`, instalación condicional según lockfile y validaciones `lint`, `test` y `build`.
+- [x] Confirmar `.github/workflows/ci.yml` con Node 22, `pnpm/action-setup@v4`, instalación condicional según lockfile y validaciones `lint`, `test` y `build` como línea base previa al lockfile.
 - [x] Registrar que CI web pasó en GitHub Actions para `pnpm install --no-frozen-lockfile --reporter=append-only`, `pnpm run lint`, `pnpm run test` y `pnpm run build`.
 - [!] Intentar `pnpm install` en Codex Cloud. Resultado real local: falló con `ERR_PNPM_FETCH_403`; no se generó `pnpm-lock.yaml` y no se fuerza desde este entorno.
 - [x] Crear workflow manual `Generate pnpm lockfile` para generar `pnpm-lock.yaml` desde GitHub Actions con Node 22, pnpm 10 y una PR automática dedicada.
-- [ ] Ejecutar el workflow manual para generar y commitear `pnpm-lock.yaml`; después, cambiar CI a `--frozen-lockfile` fijo y habilitar `cache: pnpm` en una PR posterior.
+- [x] Ejecutar el workflow manual para generar y commitear `pnpm-lock.yaml`; después, cambiar CI a `--frozen-lockfile` fijo y habilitar `cache: pnpm` en una PR posterior.
 - [!] Ejecutar `pnpm run tauri:build`. Sigue pendiente porque no forma parte del workflow web validado y la instalación local quedó bloqueada por `ERR_PNPM_FETCH_403`.
+
+### 4.4. Endurecimiento de instalación con lockfile — 2026-05-30
+
+- [x] Confirmar que `pnpm-lock.yaml` ya fue generado y mergeado en `main`.
+- [x] Cambiar `.github/workflows/ci.yml` para instalar siempre con `pnpm install --frozen-lockfile --reporter=append-only`.
+- [x] Habilitar `cache: pnpm` en `actions/setup-node@v4` manteniendo Node 22.
+- [x] Mantener `pnpm/action-setup@v4` y las validaciones `pnpm run lint`, `pnpm run test` y `pnpm run build`.
+- [x] Mantener `.github/workflows/generate-lockfile.yml` como workflow manual para regenerar `pnpm-lock.yaml` cuando cambien dependencias.
+- [x] Documentar en `docs/dependency-installation.md` que CI falla si `package.json` y `pnpm-lock.yaml` divergen.
+- [x] Registrar resultados locales de `pnpm install --frozen-lockfile --reporter=append-only`, `pnpm run lint`, `pnpm run test`, `pnpm run build` y `git diff --check` para esta PR: todos pasaron; `pnpm run build` emitió solo la advertencia existente de chunk grande de Vite.
 
 ---
 

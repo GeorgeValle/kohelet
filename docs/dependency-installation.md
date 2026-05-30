@@ -8,8 +8,9 @@
 - Package manager único: `pnpm@10.28.1`, declarado en `package.json` mediante `packageManager`.
 - Registro esperado: `https://registry.npmjs.org/`.
 - Workflow de validación web: `.github/workflows/ci.yml`.
-- Workflow manual para generar lockfile desde GitHub Actions: `.github/workflows/generate-lockfile.yml` (`Generate pnpm lockfile`).
-- Lockfile: `pnpm-lock.yaml` todavía no está commiteado porque no debe generarse desde un entorno que falle al acceder al registro npm.
+- Workflow manual para regenerar lockfile desde GitHub Actions: `.github/workflows/generate-lockfile.yml` (`Generate pnpm lockfile`).
+- Lockfile: `pnpm-lock.yaml` ya está commiteado en el repositorio y es parte obligatoria de la línea base de instalación.
+- Cache de CI: `actions/setup-node@v4` usa `cache: pnpm` porque el lockfile ya existe.
 
 No actualizar a pnpm 11 ni cambiar el registro de paquetes dentro de una PR de documentación o diagnóstico de instalación. Ese tipo de cambio requiere una decisión separada.
 
@@ -28,10 +29,10 @@ Esta configuración fuerza el registro público de npm para dependencias públic
 
 ## Diferencia entre Codex Cloud y GitHub Actions
 
-GitHub Actions es la fuente confiable de validación para la instalación actual porque PR #4 logró CI verde con:
+GitHub Actions es la fuente confiable de validación para la instalación actual. Con `pnpm-lock.yaml` commiteado, CI debe instalar siempre con:
 
 ```bash
-pnpm install --no-frozen-lockfile --reporter=append-only
+pnpm install --frozen-lockfile --reporter=append-only
 pnpm run lint
 pnpm run test
 pnpm run build
@@ -39,31 +40,19 @@ pnpm run build
 
 El entorno de Codex Cloud puede fallar con `ERR_PNPM_FETCH_403` aun cuando `.npmrc` apunte correctamente a `https://registry.npmjs.org/`. En ese caso, la causa esperada es una limitación de entorno, proxy, red o política de acceso antes de que el request llegue correctamente al registro público. Cambiar Sofer, Tiptap, UI, storage, exportación o modelos narrativos no resuelve ese 403.
 
-## Cuándo usar `--no-frozen-lockfile`
+## Uso de `--frozen-lockfile`
 
-Usar:
-
-```bash
-pnpm install --no-frozen-lockfile --reporter=append-only
-```
-
-solo mientras `pnpm-lock.yaml` no exista en el repositorio. Este modo permite que GitHub Actions resuelva dependencias desde `package.json` y mantenga verde la validación web hasta que se genere un lockfile válido desde un entorno con acceso correcto al registro npm.
-
-## Cuándo pasar a `--frozen-lockfile`
-
-Después de commitear `pnpm-lock.yaml`, cambiar la instalación de CI a:
+CI debe usar siempre:
 
 ```bash
 pnpm install --frozen-lockfile --reporter=append-only
 ```
 
-Desde ese momento, fallar si `package.json` y `pnpm-lock.yaml` divergen es deseable: protege reproducibilidad y evita actualizaciones implícitas de dependencias.
+Fallar si `package.json` y `pnpm-lock.yaml` divergen es deseable: protege reproducibilidad y evita actualizaciones implícitas de dependencias. Si se agregan, eliminan o actualizan dependencias, el cambio debe incluir la actualización correspondiente de `pnpm-lock.yaml` en la misma PR o en una PR dedicada previa.
 
-## Cuándo habilitar `cache: pnpm`
+## Cache de pnpm en CI
 
-No usar `cache: pnpm` en `actions/setup-node@v4` mientras falte `pnpm-lock.yaml`, porque el cache de pnpm de `setup-node` requiere un lockfile estable para calcular la clave de cache.
-
-Habilitarlo únicamente cuando `pnpm-lock.yaml` esté commiteado y CI use siempre `--frozen-lockfile`:
+Como `pnpm-lock.yaml` ya está commiteado, `actions/setup-node@v4` debe mantener habilitado el cache de pnpm:
 
 ```yaml
 - name: Setup Node.js
@@ -73,9 +62,11 @@ Habilitarlo únicamente cuando `pnpm-lock.yaml` esté commiteado y CI use siempr
     cache: pnpm
 ```
 
-## Cómo generar `pnpm-lock.yaml`
+El cache se basa en el lockfile estable y acelera instalaciones sin relajar la reproducibilidad del workflow.
 
-La vía preferida para esta deuda técnica es usar el workflow manual `Generate pnpm lockfile`, definido en `.github/workflows/generate-lockfile.yml`. Este workflow corre en GitHub Actions con Node 22, instala pnpm mediante `pnpm/action-setup@v4`, ejecuta:
+## Cómo regenerar `pnpm-lock.yaml`
+
+El workflow manual `Generate pnpm lockfile`, definido en `.github/workflows/generate-lockfile.yml`, queda como herramienta de mantenimiento para regenerar `pnpm-lock.yaml` cuando cambien dependencias y el entorno local no pueda hacerlo de forma confiable. Este workflow corre en GitHub Actions con Node 22, instala pnpm mediante `pnpm/action-setup@v4`, ejecuta:
 
 ```bash
 pnpm install --lockfile-only --reporter=append-only
@@ -83,7 +74,7 @@ pnpm install --lockfile-only --reporter=append-only
 
 y abre una PR automática contra `main` commiteando solo `pnpm-lock.yaml` en la rama `chore/add-pnpm-lockfile`.
 
-Usar este workflow cuando el entorno local del mantenedor o Codex Cloud no puedan generar el lockfile por diferencias de Node/pnpm, proxy, red o `ERR_PNPM_FETCH_403`. No generar ni editar `pnpm-lock.yaml` manualmente desde un entorno que falle al acceder al registro npm.
+Usar este workflow cuando el entorno local del mantenedor o Codex Cloud no puedan regenerar el lockfile por diferencias de Node/pnpm, proxy, red o `ERR_PNPM_FETCH_403`. No generar ni editar `pnpm-lock.yaml` manualmente desde un entorno que falle al acceder al registro npm.
 
 Alternativamente, desde un entorno local o remoto con acceso válido al registro público de npm:
 
@@ -93,19 +84,17 @@ pnpm install
 
 Si el comando termina correctamente:
 
-1. revisar que se haya creado `pnpm-lock.yaml`;
-2. commitear `pnpm-lock.yaml`;
-3. abrir una PR dedicada que solo incorpore el lockfile generado;
-4. dejar el endurecimiento de CI para una PR posterior, una vez mergeado `pnpm-lock.yaml`.
+1. revisar que `pnpm-lock.yaml` cambió solo por la actualización esperada de dependencias;
+2. ejecutar `pnpm install --frozen-lockfile --reporter=append-only` para confirmar consistencia;
+3. ejecutar `pnpm run lint`, `pnpm run test` y `pnpm run build`;
+4. commitear `package.json` y `pnpm-lock.yaml` juntos cuando el cambio de dependencias lo requiera.
 
-Esta PR no fuerza todavía `--frozen-lockfile`: el workflow de CI debe conservar el fallback condicional hasta que el lockfile exista en `main`. Después de mergear `pnpm-lock.yaml`, una PR posterior debe cambiar `.github/workflows/ci.yml` para usar siempre `pnpm install --frozen-lockfile --reporter=append-only` y habilitar `cache: pnpm`.
-
-Si `pnpm install` falla con `ERR_PNPM_FETCH_403`, no commitear un lockfile parcial ni cambiar dependencias para sortear la red del entorno. Registrar el fallo y generar el lockfile con el workflow manual de GitHub Actions.
+Si `pnpm install` falla con `ERR_PNPM_FETCH_403`, no commitear un lockfile parcial ni cambiar dependencias para sortear la red del entorno. Registrar el fallo y regenerar el lockfile con el workflow manual de GitHub Actions.
 
 ## Comandos locales recomendados
 
 ```bash
-pnpm install
+pnpm install --frozen-lockfile --reporter=append-only
 pnpm run lint
 pnpm run test
 pnpm run build
@@ -121,15 +110,10 @@ pnpm run tauri:build
 
 ## Comandos de CI actuales
 
-Mientras falte `pnpm-lock.yaml`, el workflow debe instalar con fallback:
+El workflow debe instalar siempre con lockfile congelado:
 
 ```bash
-if [ -f pnpm-lock.yaml ]; then
-  pnpm install --frozen-lockfile --reporter=append-only
-else
-  echo "pnpm-lock.yaml is missing; installing with --no-frozen-lockfile until the lockfile is committed."
-  pnpm install --no-frozen-lockfile --reporter=append-only
-fi
+pnpm install --frozen-lockfile --reporter=append-only
 ```
 
 Luego debe ejecutar:
@@ -162,4 +146,4 @@ pnpm run build
 4. Si el error dice que no se envió authorization header y aun así el registro es `https://registry.npmjs.org/`, tratarlo como limitación del entorno/proxy cuando GitHub Actions valida correctamente.
 5. No agregar GitHub Packages, `NODE_AUTH_TOKEN` ni credenciales para resolver dependencias públicas.
 6. No modificar Sofer, Tiptap, UI, storage, exportación ni modelos narrativos como respuesta a un 403 de instalación.
-7. Si local o Codex Cloud no pueden generar `pnpm-lock.yaml`, disparar manualmente el workflow `Generate pnpm lockfile` desde GitHub Actions.
+7. Si local o Codex Cloud no pueden regenerar `pnpm-lock.yaml`, disparar manualmente el workflow `Generate pnpm lockfile` desde GitHub Actions.
