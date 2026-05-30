@@ -42,6 +42,31 @@ Formato recomendado:
 
 > Nota: GitHub Markdown no reconoce `[~]` ni `[!]` como checkbox real, pero son útiles para lectura rápida. Si se prefiere compatibilidad visual total, usar solo `[ ]` y `[x]`.
 
+### 1.1. Convención para bloques, ramas y PRs
+
+Para que el mantenedor pueda copiar nombres de ramas, descargar branches y testear antes de mergear a `main`, cada bloque operativo nuevo debe separar el identificador corto de la descripción humana.
+
+Reglas:
+
+- **Docs heading:** usar un título principal corto con el patrón `Block N`, por ejemplo `## Block 11`.
+- **Docs subtitle:** agregar debajo un subtítulo descriptivo, por ejemplo `### Tauri project file save/open boundary`.
+- **Branch:** agregar una línea obligatoria con el patrón `block-N-short-topic`.
+- **PR title:** puede ser más descriptivo y debe seguir la convención de commits del proyecto: `(feat): ...`, `(chore): ...`, `(fix): ...` o `(docs): ...`.
+- Evitar ramas largas autogeneradas como `codex/implement-initial-local-secure-storage-with-boundary-and-docs`.
+
+Plantilla recomendada:
+
+```md
+## Block 11
+
+### Tauri project file save/open boundary
+
+**Branch:** `block-11-tauri-storage-boundary`
+**PR title:** `(feat): add Tauri project file save and open boundary`
+
+Objetivo: ...
+```
+
 ---
 
 ## 2. Documentación inicial del repositorio
@@ -309,7 +334,12 @@ Objetivo: proteger el texto del escritor.
 - [x] Actualizar `docs/storage.md`.
 - [x] Actualizar `docs/phases/phase-05-storage-recovery.md`.
 
-### 9.1. Próximo bloque planificado — storage local seguro inicial
+### 9.1. Block 10
+
+#### Storage local seguro inicial
+
+**Branch:** `block-10-tauri-storage-boundary`
+**PR title:** `(feat): add Tauri project file save and open boundary`
 
 Objetivo: dejar lista la siguiente PR para implementar el primer guardado local manual sin perder texto ni acoplar storage al editor.
 

@@ -825,6 +825,32 @@ Un escritor puede planificar, escribir, guardar, recuperar y exportar una obra n
 
 ---
 
+## 10.1. Convención de bloques de implementación
+
+Los bloques de implementación deben ser fáciles de identificar en documentación y fáciles de descargar para prueba manual antes de mergear a `main`. Para cada bloque nuevo, usar esta estructura:
+
+```md
+## Block N
+
+### Subtítulo descriptivo del objetivo
+
+**Branch:** `block-N-short-topic`
+**PR title:** `(type): descriptive PR title`
+
+Descripción funcional: qué valor entrega el bloque y qué queda fuera de alcance.
+```
+
+Reglas:
+
+- **Docs heading:** `Block N`.
+- **Docs subtitle:** descripción humana del objetivo.
+- **Branch sugerida:** `block-N-short-topic`, por ejemplo `block-10-tauri-storage-boundary`.
+- **PR title:** descriptivo y alineado con la convención de commits: `(feat): ...`, `(chore): ...`, `(fix): ...` o `(docs): ...`.
+- Evitar ramas largas autogeneradas como `codex/implement-initial-local-secure-storage-with-boundary-and-docs`.
+- No cambiar el alcance funcional del bloque solo para ajustar su nombre.
+
+---
+
 ## 11. Alcance explícitamente aplazado
 
 No implementar antes de 1.0 salvo decisión explícita:

@@ -462,19 +462,41 @@ Puede dejarse el modelo preparado de forma mínima si `project_requirements.md` 
 
 ## 11. Flujo sugerido de PR o bloque de trabajo
 
-### 11.1. Título
+### 11.1. Nomenclatura de bloque, rama y PR
 
-Usar títulos claros:
+Separar siempre el identificador corto del bloque, la descripción humana, la rama copiable y el título descriptivo del PR. Esto evita ramas largas autogeneradas difíciles de descargar o testear manualmente antes del merge a `main`.
 
-```text
-feat: add narrative structure models
-feat: create writing workspace layout
-chore: initialize design tokens
-test: add scene model validation tests
-docs: update phase 01 foundation notes
+Convención obligatoria para nuevos bloques:
+
+```md
+## Block N
+
+### Human-readable objective subtitle
+
+**Branch:** `block-N-short-topic`
+**PR title:** `(type): descriptive PR title`
 ```
 
-### 11.2. Descripción mínima
+Reglas:
+
+- Usar ramas cortas, estables y copiables con el patrón `block-N-short-topic`.
+- Preferir nombres como `block-10-tauri-storage-boundary`.
+- Evitar ramas largas autogeneradas como `codex/implement-initial-local-secure-storage-with-boundary-and-docs`.
+- Mantener el título del PR separado de la rama; el PR puede ser descriptivo y seguir la convención de commits del proyecto.
+
+### 11.2. Título de PR
+
+Usar títulos claros con la convención del proyecto:
+
+```text
+(feat): add narrative structure models
+(feat): create writing workspace layout
+(chore): initialize design tokens
+(test): add scene model validation tests
+(docs): update phase 01 foundation notes
+```
+
+### 11.3. Descripción mínima
 
 Cada PR o bloque debería explicar:
 
@@ -492,7 +514,7 @@ Cada PR o bloque debería explicar:
 ## Follow-up
 ```
 
-### 11.3. Cierre
+### 11.4. Cierre
 
 Antes de cerrar:
 
