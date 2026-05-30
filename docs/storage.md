@@ -5,7 +5,7 @@
 
 **Proyecto:** Kohelet  
 **Editor:** Sofer  
-**Estado:** planificación del primer corte de storage local seguro
+**Estado:** primer corte de storage local seguro implementado
 **Última revisión:** 2026-05-30
 
 ---
@@ -64,6 +64,10 @@ Backup remoto
 ```text
 src/lib/storage/
   projectStorage.ts
+  projectFileFormat.ts
+  projectValidation.ts
+  storageErrors.ts
+  migrations.ts
   autosaveStorage.ts
   snapshotStorage.ts
   recoveryStorage.ts
@@ -124,7 +128,39 @@ Reglas:
 
 ---
 
-## 6. Autoguardado
+## 6. Primer corte implementado — 2026-05-30
+
+El primer corte deja una base pura, testeable y desacoplada de UI/editor:
+
+```text
+src/lib/model/ids.ts
+src/lib/model/project.ts
+src/lib/model/storyWorld.ts
+src/lib/model/scene.ts
+src/lib/model/createInitialProject.ts
+src/lib/storage/projectFileFormat.ts
+src/lib/storage/projectValidation.ts
+src/lib/storage/storageErrors.ts
+src/lib/storage/migrations.ts
+src/lib/storage/projectStorage.ts
+```
+
+Incluye:
+
+- tipos mínimos para `StoryWorld`, `Work`, `Part`, `Chapter`, `Scene` y `KoheletProjectFile`;
+- `app: 'kohelet'` y `schemaVersion: 1`;
+- serialización JSON estable, formateada y legible;
+- parseo desde texto crudo antes de validar;
+- validación mínima de integridad del envelope, mundo narrativo, obras y escenas;
+- validación de que cada `Scene.workId` apunte a una `Work` existente;
+- validación de que `Scene.content` exista y sea serializable;
+- errores tipados para `invalid_schema`, `unsupported_schema_version`, `read_failed` y `write_failed`;
+- stub de migraciones que acepta versión 1 y rechaza versiones futuras;
+- factory inicial con una escena vacía compatible con Sofer/Tiptap.
+
+El boundary real de filesystem de Tauri todavía no está implementado en este corte. `projectStorage.saveProjectFile` acepta un `ProjectFileWriter` inyectado para mantener separada la serialización/validación pura del acceso a disco. El siguiente corte debe conectar ese boundary a una escritura segura con archivo temporal y reemplazo atómico o la alternativa más segura disponible en Tauri 2.
+
+## 7. Autoguardado
 
 Objetivo: reducir pérdida de texto sin interrumpir escritura.
 
@@ -150,7 +186,7 @@ export type SaveState =
 
 ---
 
-## 7. Snapshots
+## 8. Snapshots
 
 Los snapshots son copias de seguridad internas.
 
@@ -177,7 +213,7 @@ La ruta final dependerá de Tauri y sistema operativo.
 
 ---
 
-## 8. Recovery
+## 9. Recovery
 
 Recovery se activa cuando la app detecta datos no confirmados o cierre inesperado.
 
@@ -198,7 +234,7 @@ RecoveryDialog.module.css
 
 ---
 
-## 9. Escritura segura
+## 10. Escritura segura
 
 Para reducir corrupción:
 
@@ -215,7 +251,7 @@ Si Tauri o el sistema no permiten un paso exacto, implementar la alternativa má
 
 ---
 
-## 10. Migraciones
+## 11. Migraciones
 
 Archivo:
 
@@ -240,7 +276,7 @@ export function migrateProjectFile(input: unknown): KoheletProjectFile {
 
 ---
 
-## 11. Preferencias de UI
+## 12. Preferencias de UI
 
 Preferencias que pueden vivir fuera del archivo de proyecto:
 
@@ -262,7 +298,7 @@ localStorage nunca debe ser fuente principal del manuscrito.
 
 ---
 
-## 12. Errores de storage
+## 13. Errores de storage
 
 La UI debe comunicar errores importantes.
 
