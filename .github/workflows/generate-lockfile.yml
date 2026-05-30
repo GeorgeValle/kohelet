@@ -1,0 +1,60 @@
+name: Generate pnpm lockfile
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  generate-lockfile:
+    name: Generate pnpm-lock.yaml
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Show environment
+        run: |
+          node -v
+          pnpm -v
+          npm config get registry
+          pnpm config get registry
+
+      - name: Generate lockfile
+        run: pnpm install --lockfile-only --reporter=append-only
+
+      - name: Verify lockfile
+        run: |
+          test -f pnpm-lock.yaml
+          git status --short pnpm-lock.yaml
+
+      - name: Create lockfile pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: main
+          branch: chore/add-pnpm-lockfile
+          commit-message: "(chore): add pnpm lockfile"
+          title: "(chore): add pnpm lockfile"
+          body: |
+            Generates pnpm-lock.yaml from GitHub Actions using Node 22 and pnpm from packageManager.
+
+            This PR only commits the generated lockfile. CI hardening to require --frozen-lockfile should happen in a follow-up PR after this lockfile is merged.
+          add-paths: |
+            pnpm-lock.yaml
