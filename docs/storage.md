@@ -5,8 +5,8 @@
 
 **Proyecto:** Kohelet  
 **Editor:** Sofer  
-**Estado:** inicial  
-**Última revisión:** 2026-05-24
+**Estado:** planificación del primer corte de storage local seguro
+**Última revisión:** 2026-05-30
 
 ---
 
@@ -324,3 +324,181 @@ Antes de cerrar una tarea de storage:
 - [ ] Textos visibles están en i18n.
 - [ ] Se actualizó `docs/task.md`.
 - [ ] Se registró ADR si cambió formato de archivo o estrategia.
+
+---
+
+## 12. Auditoría actual — 2026-05-30
+
+Estado observado antes del primer corte de storage local seguro:
+
+- Sofer existe como editor mínimo de escena mock en memoria. `EditorShell` monta Tiptap, toolbar, superficie editable y status bar.
+- La serialización actual está limitada a helpers de editor: `emptyDoc`, `normalizeDoc` y `getEditorJson`. Esto confirma JSON estructurado, pero todavía no hay persistencia durable.
+- El conteo de palabras existe para texto de la escena activa.
+- No existen todavía tipos TypeScript implementados para `StoryWorld`, `Work`, `Part`, `Chapter`, `Scene` ni `KoheletProjectFile` bajo `src/lib/model/` o equivalente. El modelo vive documentado en `docs/data-model.md`.
+- No existe todavía `src/lib/storage/`, ni `projectStorage`, ni autosave, snapshots, recovery, migraciones o comandos Tauri de filesystem.
+- El status bar muestra un estado estático de guardado; no representa todavía estado real de persistencia.
+- Tests relevantes actuales: render de app/workspace, serialización mínima del editor y conteo de palabras. No hay tests de storage ni validación de archivo de proyecto.
+
+Conclusión: el próximo bloque debe ser pequeño, documentalmente alineado y centrado en crear una base durable para guardar un proyecto local sin mezclar storage con componentes React ni convertir `localStorage` en fuente del manuscrito.
+
+---
+
+## 13. Próximo bloque pequeño — Storage local seguro inicial
+
+Objetivo del bloque:
+
+```text
+Crear la primera base de almacenamiento local de proyecto para que Kohelet pueda serializar y guardar un proyecto con escenas sin perder texto.
+```
+
+Este bloque debe preparar crear/abrir/guardar/autoguardar/snapshots/recovery, pero implementar solo el primer corte seguro: formato, validación mínima y guardado manual inicial.
+
+### 13.1. Modelo mínimo de archivo local
+
+Crear un contrato inicial de archivo versionado:
+
+```ts
+export type KoheletProjectFile = {
+  app: 'kohelet';
+  schemaVersion: 1;
+  savedAt: ISODateString;
+  storyWorld: StoryWorld;
+};
+```
+
+Reglas del primer corte:
+
+- Usar extensión `.kohelet`.
+- Guardar JSON estructurado.
+- Mantener `schemaVersion` en el envelope, aunque `ProjectSettings` también documente versión para preferencias del proyecto.
+- Mantener `Scene.content` como `unknown` serializable compatible con JSON de Tiptap.
+- No guardar un documento gigante: las escenas son unidades separadas dentro de `Work.scenes`.
+- No agregar cloud sync, colaboración, IA ni exportación avanzada.
+
+### 13.2. Tipos de dominio mínimos
+
+Antes de storage real, el primer corte debe crear o consolidar tipos mínimos en una capa de modelo, por ejemplo:
+
+```text
+src/lib/model/ids.ts
+src/lib/model/project.ts
+src/lib/model/scene.ts
+src/lib/model/storyWorld.ts
+```
+
+Alcance mínimo recomendado:
+
+- `ID` e `ISODateString`.
+- `StoryWorld`, `Work`, `Part`, `Chapter`, `Scene` según `docs/data-model.md`, permitiendo `Part` y `Chapter` opcionales.
+- `Scene.content: unknown` para preservar JSON de Sofer.
+- `SceneStatus`, `SceneType`, `StoryWorldType`, `WorkType` y `StructureMode`.
+- Una factory de proyecto vacío o proyecto inicial con una escena vacía puede existir en dominio, no en UI.
+
+### 13.3. Capa `projectStorage`
+
+Crear una capa enfocada, sin UI:
+
+```text
+src/lib/storage/projectFileFormat.ts
+src/lib/storage/projectValidation.ts
+src/lib/storage/projectStorage.ts
+src/lib/storage/storageErrors.ts
+src/lib/storage/migrations.ts
+```
+
+Responsabilidades iniciales:
+
+- `serializeProjectFile(projectFile): string`.
+- `parseProjectFile(raw: string): unknown`.
+- `validateProjectFile(input: unknown): KoheletProjectFile`.
+- `saveProject(path, projectFile)` usando escritura segura.
+- `openProject(path)` parseando, validando y migrando cuando corresponda.
+- Errores tipados para `invalid_schema`, `unsupported_schema_version`, `read_failed` y `write_failed`.
+
+La UI debe llamar a esta capa desde un boundary claro. Los componentes de editor no deben importar APIs de filesystem.
+
+### 13.4. Boundary Tauri/filesystem
+
+Para el primer corte, la implementación debe definir un límite explícito:
+
+```text
+React/UI → servicio TypeScript de storage → comando Tauri pequeño → filesystem
+```
+
+Requisitos del boundary:
+
+- No usar `localStorage` como persistencia de manuscrito.
+- Mantener permisos Tauri explícitos y documentados cuando se agreguen.
+- Evitar lógica de rutas dentro de componentes React.
+- Devolver errores claros al servicio TypeScript.
+- No interceptar la X nativa de la ventana en este bloque.
+
+### 13.5. Escritura segura para guardado manual
+
+El guardado manual inicial debe seguir este patrón, o documentar una alternativa equivalente si Tauri limita algún paso:
+
+1. Clonar/preparar payload desde el modelo de proyecto actual.
+2. Normalizar contenido de escenas con helpers compatibles con Sofer cuando corresponda.
+3. Validar `KoheletProjectFile`.
+4. Serializar con JSON estable y `savedAt` actualizado.
+5. Escribir a archivo temporal cercano al destino.
+6. Reemplazar el archivo final mediante operación atómica o la alternativa más segura disponible.
+7. Conservar el payload anterior o preparar snapshot antes de reemplazos riesgosos en cortes posteriores.
+8. Reportar error sin marcar como guardado si falla cualquier paso.
+
+### 13.6. Validaciones mínimas de integridad
+
+El primer corte debe validar al menos:
+
+- `app === 'kohelet'`.
+- `schemaVersion === 1` o versión migrable explícitamente soportada.
+- `savedAt` presente como string ISO.
+- `storyWorld.id`, `storyWorld.title`, `storyWorld.type`, `storyWorld.settings`.
+- `storyWorld.works` como arreglo no vacío para proyectos con manuscrito.
+- Cada `Work.id`, `Work.storyWorldId`, `Work.title`, `Work.order`, `Work.structureMode`.
+- Cada `Scene.id`, `Scene.workId`, `Scene.title`, `Scene.order`, `Scene.type`, `Scene.status`, `Scene.content`.
+- `Scene.workId` apunta a una `Work` existente.
+- `Chapter.sceneIds` apunta a escenas existentes cuando haya capítulos.
+- `Part.chapterIds` apunta a capítulos existentes cuando haya partes.
+- El contenido de escena es serializable y, si tiene forma de Tiptap, no depende del DOM visible.
+
+No se debe intentar reparar silenciosamente datos que puedan borrar texto. Las reparaciones destructivas requieren decisión documentada y tests.
+
+### 13.7. Base para autosave, snapshots y recovery
+
+Este bloque no debe implementar todavía el flujo completo, pero debe dejar puntos de extensión:
+
+- `SaveState` real en storage/editor shell: `saved`, `dirty`, `saving`, `error`, `recovered`.
+- API futura separada para `autosaveStorage.ts`, no mezclada con `projectStorage.ts`.
+- API futura separada para `snapshotStorage.ts` con política de retención.
+- API futura separada para `recoveryStorage.ts` que preserve payloads recuperables hasta resolución explícita.
+- Tests futuros para detección de recovery y snapshots.
+
+### 13.8. Tests mínimos del primer corte de implementación
+
+Cuando se implemente el primer corte, agregar tests unitarios para:
+
+- serializar un proyecto válido con una escena vacía de Sofer;
+- abrir/validar un archivo `.kohelet` válido;
+- rechazar `app` incorrecto;
+- rechazar `schemaVersion` futuro no soportado;
+- rechazar escena sin `content`;
+- preservar `Scene.content` estructurado durante roundtrip;
+- mapear errores de lectura/escritura a categorías tipadas.
+
+Si se agregan comandos Tauri, sumar la validación de escritorio correspondiente cuando el entorno lo permita.
+
+### 13.9. Fuera de alcance explícito del primer corte
+
+No implementar en este bloque:
+
+- sincronización cloud;
+- colaboración multiusuario;
+- IA;
+- exportación RTF/DOCX/PDF;
+- snapshots periódicos completos;
+- recovery UI completo;
+- migraciones reales más allá de rechazar versiones futuras o dejar stub explícito;
+- adjuntos pesados;
+- almacenamiento principal del manuscrito en `localStorage`;
+- toolbar o funciones tipo Word no relacionadas con persistencia de escenas.

@@ -626,3 +626,46 @@ La instalación debe ser reproducible y fácil de diagnosticar sin introducir cr
 - [x] CI quedó simplificado a `pnpm install --frozen-lockfile --reporter=append-only` y `actions/setup-node@v4` quedó con `cache: pnpm`.
 - [x] El workflow manual `Generate pnpm lockfile` se mantiene como herramienta para regenerar el lockfile cuando cambien dependencias.
 - [ ] Si se cambian dependencias, actualizar `package.json` y `pnpm-lock.yaml` de forma consistente; CI debe fallar cuando diverjan.
+
+---
+
+## ADR-016 — Primer corte de storage local seguro
+
+**Fecha:** 2026-05-30
+**Estado:** aceptada
+**Documentos relacionados:** `docs/storage.md`, `docs/data-model.md`, `docs/editor-core.md`, `docs/task.md`
+
+### Contexto
+
+La instalación ya quedó solidificada con `pnpm-lock.yaml` y CI usa instalación con lockfile congelado. Sofer ya tiene un editor mínimo de escena en memoria con serialización JSON básica, pero todavía no existe persistencia durable, modelo implementado ni capa `src/lib/storage/`.
+
+### Decisión
+
+El próximo bloque funcional será un primer corte pequeño de storage local seguro:
+
+- archivo local `.kohelet` en JSON estructurado;
+- envelope `KoheletProjectFile` con `app: 'kohelet'`, `schemaVersion: 1`, `savedAt` y `storyWorld`;
+- `Scene.content` como contenido estructurado serializable compatible con Sofer/Tiptap;
+- capa `projectStorage` separada de React y del editor;
+- guardado manual inicial con escritura segura;
+- validación mínima de integridad antes de abrir o marcar como guardado;
+- stubs o puntos de extensión para autosave, snapshots, recovery y migraciones futuras.
+
+### Motivo
+
+La prioridad máxima del producto es no perder texto. Antes de sumar más UI, módulos narrativos o exportación, Kohelet necesita una base durable y versionada para guardar escenas sin depender de memoria React ni de `localStorage`.
+
+### Consecuencias
+
+- `localStorage` queda limitado a preferencias de UI o datos pequeños documentados, nunca al manuscrito principal.
+- Los componentes React no deben escribir archivos directamente ni contener lógica de rutas.
+- Sofer no debe conocer detalles de filesystem.
+- Cloud sync, colaboración, IA, snapshots completos, recovery UI completo y exportación quedan fuera del primer corte.
+- La próxima PR debe incluir tests de validación/roundtrip y actualizar `docs/phases/phase-05-storage-recovery.md` si implementa parte de la fase.
+
+### Seguimiento
+
+- [ ] Implementar tipos mínimos de dominio y `KoheletProjectFile`.
+- [ ] Implementar `src/lib/storage/projectStorage.ts` y módulos auxiliares.
+- [ ] Implementar guardado manual inicial mediante boundary Tauri seguro.
+- [ ] Agregar tests de validación, serialización y errores tipados.
