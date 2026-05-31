@@ -2,7 +2,7 @@ import type { KoheletProjectFile } from '../model/project';
 import { migrateProjectFile } from './migrations';
 import { parseProjectFile, serializeProjectFile } from './projectFileFormat';
 import { validateProjectFile } from './projectValidation';
-import { writeFailed } from './storageErrors';
+import { KoheletStorageError, writeFailed } from './storageErrors';
 
 export type ProjectFileWriter = {
   writeProjectFile: (serializedProjectFile: string) => Promise<void> | void;
@@ -27,6 +27,10 @@ export async function saveProjectFile(projectFile: KoheletProjectFile, writer: P
   try {
     await writer.writeProjectFile(serialized);
   } catch (error) {
+    if (error instanceof KoheletStorageError) {
+      throw error;
+    }
+
     throw writeFailed('Project file could not be written by the storage boundary.', error);
   }
 }

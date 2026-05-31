@@ -322,7 +322,7 @@ Objetivo: crear módulos conectados a escenas, obras y mundo narrativo.
 Objetivo: proteger el texto del escritor.
 
 - [x] Crear estructura de proyecto local.
-- [ ] Crear guardado local.
+- [x] Crear guardado local mediante boundary Tauri de filesystem para archivos `.kohelet`; la UI final de abrir/guardar queda pendiente.
 - [x] Crear apertura de proyecto local desde texto `.kohelet` validado.
 - [ ] Implementar autoguardado configurable.
 - [ ] Implementar snapshots periódicos.
@@ -334,51 +334,38 @@ Objetivo: proteger el texto del escritor.
 - [x] Actualizar `docs/storage.md`.
 - [x] Actualizar `docs/phases/phase-05-storage-recovery.md`.
 
-### 9.1. Block 10
+## Block 10
 
-#### Storage local seguro inicial
+### Tauri project file save/open boundary
 
 **Branch:** `block-10-tauri-storage-boundary`
 **PR title:** `(feat): add Tauri project file save and open boundary`
 
-Objetivo: dejar lista la siguiente PR para implementar el primer guardado local manual sin perder texto ni acoplar storage al editor.
+Objetivo: conectar la capa pura de storage con un boundary real de filesystem Tauri para abrir y guardar archivos `.kohelet`, sin acoplar React ni Sofer al acceso a disco.
 
-Estado auditado al 2026-05-30:
+Estado al cierre del bloque:
 
-- [x] Confirmar que Sofer actual edita una escena mock en memoria con Tiptap y JSON estructurado mínimo.
-- [x] Confirmar que todavía no existen tipos implementados de `StoryWorld`, `Work`, `Part`, `Chapter`, `Scene` ni `KoheletProjectFile` en `src/`.
-- [x] Confirmar que todavía no existe `src/lib/storage/`, `projectStorage`, autosave, snapshots, recovery ni migraciones.
-- [x] Confirmar que los tests relevantes actuales cubren app/workspace, serialización mínima del editor y conteo de palabras, pero no storage.
+- [x] Agregar `src/lib/storage/tauriProjectFileStorage.ts` como boundary TypeScript UI-free para `openProjectFromPath` y `saveProjectToPath`.
+- [x] Reusar `openProjectFromText`, `prepareProjectForSave` y `saveProjectFile` para que la validación/serialización siga en la capa pura de storage.
+- [x] Agregar comandos Tauri `read_project_file_text` y `write_project_file_text`.
+- [x] Implementar escritura segura en Rust con archivo temporal hermano, flush/sync y reemplazo/rename al destino final.
+- [x] Mapear errores reales de filesystem a categorías tipadas de storage, incluyendo `file_not_found`, `permission_denied`, `read_failed` y `write_failed`.
+- [x] Corregir la validación de integridad para exigir que cada `Scene.workId` coincida con la `Work` contenedora, no solo con una `Work` existente globalmente.
+- [x] Agregar tests TypeScript para el boundary Tauri mockeado y el mapeo de errores.
+- [x] Agregar tests Rust mínimos para lectura y escritura segura del archivo de proyecto.
+- [x] Documentar el boundary, sus límites y la decisión de separación TS/Rust.
 
-Checklist para la próxima PR de implementación:
+Fuera de alcance de este bloque:
 
-- [x] Crear tipos mínimos de dominio compatibles con `docs/data-model.md`.
-- [x] Crear `KoheletProjectFile` schema versionado con `app: 'kohelet'`, `schemaVersion: 1`, `savedAt` y `storyWorld`.
-- [x] Usar extensión `.kohelet` para archivos de proyecto locales.
-- [x] Crear `src/lib/storage/projectFileFormat.ts` para serialización JSON inicial.
-- [x] Crear `src/lib/storage/projectValidation.ts` con validaciones mínimas de integridad.
-- [x] Crear `src/lib/storage/storageErrors.ts` con categorías tipadas.
-- [x] Crear `src/lib/storage/migrations.ts` con rechazo claro de versiones futuras y stub para migraciones.
-- [x] Crear `src/lib/storage/projectStorage.ts` para apertura desde texto, preparación de guardado y boundary de escritura inyectado.
-- [x] Definir boundary de escritura inyectado sin lógica de rutas en componentes React; Tauri real queda para el siguiente corte.
-- [~] Implementar guardado manual inicial con escritura temporal y reemplazo seguro, o documentar alternativa equivalente. En este corte se documenta y testea el boundary puro; falta conectar filesystem Tauri seguro.
-- [x] Mantener `Scene.content` como JSON estructurado serializable compatible con Sofer.
-- [x] No usar `localStorage` como fuente principal del manuscrito.
-- [x] No interceptar la X nativa de la ventana en este bloque.
-- [x] Dejar autosave, snapshots y recovery como puntos de extensión separados, sin implementar flujo completo todavía.
-- [x] Agregar tests unitarios para validación, roundtrip de `Scene.content` y errores tipados.
-- [ ] Si se toca UI de guardado, agregar textos visibles en `src/i18n/locales/es-AR.json`.
-- [x] Actualizar `docs/storage.md`, `docs/task.md` y `docs/phases/phase-05-storage-recovery.md` al cerrar la implementación.
-
-Fuera de alcance de la próxima PR:
-
+- [ ] UI final de abrir/guardar.
+- [ ] File picker.
+- [ ] Autosave.
+- [ ] Snapshots.
+- [ ] Recovery UI.
+- [ ] Exportación RTF/DOCX/PDF.
 - [ ] Cloud sync.
-- [ ] Colaboración multiusuario.
 - [ ] IA.
-- [ ] Exportación avanzada o RTF.
-- [ ] Recovery UI completo.
-- [ ] Snapshots periódicos completos.
-- [ ] Adjuntos pesados.
+- [ ] Toolbar o edición avanzada tipo Word.
 
 ---
 

@@ -51,7 +51,14 @@ export function validateProjectFile(candidate: unknown): KoheletProjectFile {
     for (const [sceneIndex, sceneValue] of scenes.entries()) {
       const scene = requireRecord(sceneValue, `Scene at index ${sceneIndex} in Work ${workId} must be an object.`);
       requireString(scene.id, `Scene at index ${sceneIndex} id must be a string.`);
-      requireString(scene.workId, `Scene ${String(scene.id)} workId must be a string.`);
+      const sceneWorkId = requireString(scene.workId, `Scene ${String(scene.id)} workId must be a string.`);
+      if (sceneWorkId !== workId) {
+        throw invalidSchema('Scene workId must match its containing Work.', {
+          sceneId: scene.id,
+          sceneWorkId,
+          containingWorkId: workId,
+        });
+      }
       requireString(scene.title, `Scene ${String(scene.id)} title must be a string.`);
       requireNumber(scene.order, `Scene ${String(scene.id)} order must be a number.`);
       requireEnum<SceneType>(scene.type, SCENE_TYPES, `Scene ${String(scene.id)} type is invalid.`);

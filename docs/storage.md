@@ -152,13 +152,53 @@ Incluye:
 - serialización JSON estable, formateada y legible;
 - parseo desde texto crudo antes de validar;
 - validación mínima de integridad del envelope, mundo narrativo, obras y escenas;
-- validación de que cada `Scene.workId` apunte a una `Work` existente;
+- validación de que cada `Scene.workId` coincida con la `Work` contenedora;
 - validación de que `Scene.content` exista y sea serializable;
 - errores tipados para `invalid_schema`, `unsupported_schema_version`, `read_failed` y `write_failed`;
 - stub de migraciones que acepta versión 1 y rechaza versiones futuras;
 - factory inicial con una escena vacía compatible con Sofer/Tiptap.
 
-El boundary real de filesystem de Tauri todavía no está implementado en este corte. `projectStorage.saveProjectFile` acepta un `ProjectFileWriter` inyectado para mantener separada la serialización/validación pura del acceso a disco. El siguiente corte debe conectar ese boundary a una escritura segura con archivo temporal y reemplazo atómico o la alternativa más segura disponible en Tauri 2.
+Block 10 agrega el boundary real de filesystem Tauri sin mezclarlo con React ni Sofer. `projectStorage.saveProjectFile` sigue aceptando un `ProjectFileWriter` inyectado, y `src/lib/storage/tauriProjectFileStorage.ts` lo adapta a comandos Tauri concretos para leer y escribir texto de proyecto.
+
+## 6.1. Boundary Tauri implementado — 2026-05-31
+
+Block 10 conecta el storage puro con el filesystem real de Tauri mediante una frontera explícita:
+
+```text
+src/lib/storage/tauriProjectFileStorage.ts
+src-tauri/src/project_file_storage.rs
+```
+
+La API TypeScript expone:
+
+```ts
+openProjectFromPath(path: string)
+saveProjectToPath(path: string, projectFile: KoheletProjectFile)
+```
+
+Reglas del boundary:
+
+- no importa React;
+- no conoce Sofer, Tiptap ni componentes;
+- lee texto crudo con `read_project_file_text` y después delega parseo/migración/validación a `openProjectFromText`;
+- valida y serializa con `saveProjectFile` antes de invocar `write_project_file_text`;
+- permite inyectar un `TauriProjectFileInvoker` para tests unitarios sin tocar disco real ni UI.
+
+Los comandos Rust quedan registrados en `src-tauri/src/lib.rs` y se mantienen pequeños:
+
+- `read_project_file_text(path)` lee UTF-8 desde el path recibido;
+- `write_project_file_text(path, contents)` escribe primero a un archivo temporal hermano, sincroniza el archivo y luego reemplaza/renombra hacia el destino final.
+
+La escritura segura usa un temporal en el mismo directorio para que el reemplazo tenga la mejor semántica disponible por plataforma. Si el reemplazo directo no puede sobrescribir el destino, se usa un backup temporal del archivo anterior y se intenta restaurarlo si falla el reemplazo final. Snapshots versionados y backups de usuario quedan para un bloque posterior.
+
+Los errores de filesystem se mapean a errores tipados de dominio:
+
+- `file_not_found`;
+- `permission_denied`;
+- `read_failed`;
+- `write_failed`.
+
+No se agregan permisos genéricos de filesystem ni plugins Tauri. El acceso a disco ocurre mediante comandos propios registrados explícitamente; cuando se agregue file picker o plugins de filesystem, sus capabilities deberán mantenerse mínimas y documentarse.
 
 ## 7. Autoguardado
 
@@ -379,7 +419,7 @@ Conclusión: el próximo bloque debe ser pequeño, documentalmente alineado y ce
 
 ---
 
-## 13. Próximo bloque pequeño — Storage local seguro inicial
+## 13. Bloques de storage local
 
 Objetivo del bloque:
 
@@ -493,7 +533,7 @@ El primer corte debe validar al menos:
 - `storyWorld.works` como arreglo no vacío para proyectos con manuscrito.
 - Cada `Work.id`, `Work.storyWorldId`, `Work.title`, `Work.order`, `Work.structureMode`.
 - Cada `Scene.id`, `Scene.workId`, `Scene.title`, `Scene.order`, `Scene.type`, `Scene.status`, `Scene.content`.
-- `Scene.workId` apunta a una `Work` existente.
+- `Scene.workId` coincide con la `Work` que contiene la escena, para evitar escenas bendecidas dentro de una obra equivocada.
 - `Chapter.sceneIds` apunta a escenas existentes cuando haya capítulos.
 - `Part.chapterIds` apunta a capítulos existentes cuando haya partes.
 - El contenido de escena es serializable y, si tiene forma de Tiptap, no depende del DOM visible.
