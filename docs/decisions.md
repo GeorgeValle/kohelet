@@ -701,6 +701,7 @@ La prioridad es proteger el texto del escritor. Mantener el filesystem detrás d
 - Autosave, snapshots y recovery deben implementarse como módulos separados, no dentro de `tauriProjectFileStorage`.
 - Si se agregan file picker o plugins de filesystem, sus capabilities deberán ser mínimas y documentadas.
 - La escritura segura actual no reemplaza snapshots versionados; esos siguen pendientes para un bloque posterior.
+- El destino de guardado existente debe ser un archivo regular; directorios, symlinks y otros tipos no seguros se rechazan como `write_failed` antes de mover backups o reemplazar paths.
 
 ### Seguimiento
 

@@ -18,6 +18,7 @@ Protect the writer's text with local project files, validation, future migration
 - Added an initial project factory with one `StoryWorld`, one `Work` and one empty Sofer/Tiptap-compatible `Scene`.
 - Added unit tests for serialization, parse/validation, invalid app, future schema version, missing scene content, mismatched containing `Scene.workId`, structured content roundtrip, typed validation errors, Tauri boundary mapping and factory validity.
 - Added Rust tests for project file read and safe-write replacement helpers.
+- Added a hotfix guard so safe-write rejects existing non-regular destinations, including directories, before moving backups or replacing project file paths.
 
 ## Not implemented yet
 

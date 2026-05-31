@@ -355,6 +355,11 @@ Estado al cierre del bloque:
 - [x] Agregar tests Rust mínimos para lectura y escritura segura del archivo de proyecto.
 - [x] Documentar el boundary, sus límites y la decisión de separación TS/Rust.
 
+Hotfix posterior:
+
+- [x] Rechazar destinos de guardado existentes que no sean archivos regulares antes de crear backups o reemplazar paths.
+- [x] Agregar test Rust para impedir que un path `.kohelet` existente como directorio sea renombrado, respaldado o reemplazado.
+
 Fuera de alcance de este bloque:
 
 - [ ] UI final de abrir/guardar.

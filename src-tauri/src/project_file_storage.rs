@@ -31,6 +31,8 @@ pub fn safe_write_project_file_text(
     path: &Path,
     contents: &[u8],
 ) -> Result<(), ProjectFileCommandError> {
+    ensure_replaceable_project_file_destination(path)?;
+
     let temp_path = temporary_path_for(path)?;
     let backup_path = backup_path_for(path)?;
 
@@ -42,6 +44,32 @@ pub fn safe_write_project_file_text(
             let _ = fs::remove_file(&temp_path);
             Err(map_io_error(error, path, "write_failed"))
         }
+    }
+}
+
+fn ensure_replaceable_project_file_destination(path: &Path) -> Result<(), ProjectFileCommandError> {
+    match fs::symlink_metadata(path) {
+        Ok(metadata) if metadata.file_type().is_file() => Ok(()),
+        Ok(_) => Err(ProjectFileCommandError {
+            code: "write_failed",
+            message: "Project file destination already exists and is not a regular file."
+                .to_string(),
+            path: path.display().to_string(),
+        }),
+        Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(()),
+        Err(error) => Err(map_io_error(error, path, "write_failed")),
+    }
+}
+
+fn ensure_replaceable_project_file_destination_for_io(path: &Path) -> io::Result<()> {
+    match fs::symlink_metadata(path) {
+        Ok(metadata) if metadata.file_type().is_file() => Ok(()),
+        Ok(_) => Err(io::Error::new(
+            io::ErrorKind::Other,
+            "project file destination already exists and is not a regular file",
+        )),
+        Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(()),
+        Err(error) => Err(error),
     }
 }
 
@@ -63,7 +91,8 @@ fn replace_with_temp_file(
 ) -> io::Result<()> {
     match fs::rename(temp_path, final_path) {
         Ok(()) => Ok(()),
-        Err(first_error) if final_path.exists() => {
+        Err(_first_error) if final_path.exists() => {
+            ensure_replaceable_project_file_destination_for_io(final_path)?;
             fs::rename(final_path, backup_path)?;
 
             match fs::rename(temp_path, final_path) {
@@ -178,6 +207,34 @@ mod tests {
             })
             .count();
         assert_eq!(leftovers, 1);
+        fs::remove_dir_all(&dir).expect("test temp dir should be removed");
+    }
+
+    #[test]
+    fn rejects_directory_destination_without_moving_or_backing_it_up() {
+        let dir = unique_temp_dir();
+        fs::create_dir_all(&dir).expect("test temp dir should be created");
+        let path = dir.join("story.kohelet");
+        fs::create_dir_all(&path).expect("directory destination should be created");
+
+        let error = safe_write_project_file_text(&path, b"new")
+            .expect_err("directory destination should be rejected");
+
+        assert_eq!(error.code, "write_failed");
+        assert!(path.is_dir());
+        assert!(!path.is_file());
+
+        let backup_count = fs::read_dir(&dir)
+            .expect("test temp dir should be readable")
+            .filter_map(Result::ok)
+            .filter(|entry| {
+                let file_name = entry.file_name();
+                let file_name = file_name.to_string_lossy();
+                file_name.starts_with(".story.kohelet.") && file_name.ends_with(".bak")
+            })
+            .count();
+        assert_eq!(backup_count, 0);
+
         fs::remove_dir_all(&dir).expect("test temp dir should be removed");
     }
 }
