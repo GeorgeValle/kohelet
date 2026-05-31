@@ -73,12 +73,29 @@ describe('project local storage', () => {
     expect(roundtripped.storyWorld.works[0]?.scenes[0]?.content).toEqual(content);
   });
 
-
   it('rejects a scene whose workId does not point to an existing Work', () => {
     const project = makeProject();
     project.storyWorld.works[0]!.scenes[0]!.workId = 'missing-work';
 
-    expect(() => validateProjectFile(project)).toThrow(/workId must point to an existing Work/);
+    expect(() => validateProjectFile(project)).toThrow(/workId must match its containing Work/);
+  });
+
+  it('rejects a scene whose workId points to a different existing containing Work', () => {
+    const project = makeProject();
+    const firstWork = project.storyWorld.works[0];
+    if (!firstWork) {
+      throw new Error('Test project must include a first Work.');
+    }
+    const secondWork = {
+      ...firstWork,
+      id: 'work-second',
+      order: 1,
+      scenes: [],
+    };
+    project.storyWorld.works = [firstWork, secondWork];
+    firstWork.scenes[0]!.workId = secondWork.id;
+
+    expect(() => validateProjectFile(project)).toThrow(/workId must match its containing Work/);
   });
 
   it('rejects scene content that cannot be serialized', () => {

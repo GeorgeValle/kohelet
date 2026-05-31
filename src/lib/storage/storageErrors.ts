@@ -1,4 +1,10 @@
-export type StorageErrorCategory = 'invalid_schema' | 'unsupported_schema_version' | 'read_failed' | 'write_failed';
+export type StorageErrorCategory =
+  | 'invalid_schema'
+  | 'unsupported_schema_version'
+  | 'file_not_found'
+  | 'permission_denied'
+  | 'read_failed'
+  | 'write_failed';
 
 export class KoheletStorageError extends Error {
   readonly category: StorageErrorCategory;
@@ -18,6 +24,14 @@ export function invalidSchema(message: string, details?: unknown): KoheletStorag
 
 export function unsupportedSchemaVersion(version: unknown): KoheletStorageError {
   return new KoheletStorageError('unsupported_schema_version', 'Unsupported Kohelet project schema version.', { version });
+}
+
+export function fileNotFound(message: string, details?: unknown): KoheletStorageError {
+  return new KoheletStorageError('file_not_found', message, details);
+}
+
+export function permissionDenied(message: string, details?: unknown): KoheletStorageError {
+  return new KoheletStorageError('permission_denied', message, details);
 }
 
 export function readFailed(message: string, details?: unknown): KoheletStorageError {
