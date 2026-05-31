@@ -189,7 +189,7 @@ Los comandos Rust quedan registrados en `src-tauri/src/lib.rs` y se mantienen pe
 - `read_project_file_text(path)` lee UTF-8 desde el path recibido;
 - `write_project_file_text(path, contents)` escribe primero a un archivo temporal hermano, sincroniza el archivo y luego reemplaza/renombra hacia el destino final.
 
-La escritura segura usa un temporal en el mismo directorio para que el reemplazo tenga la mejor semántica disponible por plataforma. Si el reemplazo directo no puede sobrescribir el destino, se usa un backup temporal del archivo anterior y se intenta restaurarlo si falla el reemplazo final. Snapshots versionados y backups de usuario quedan para un bloque posterior.
+La escritura segura usa un temporal en el mismo directorio para que el reemplazo tenga la mejor semántica disponible por plataforma. Antes de reemplazar o mover un backup, el destino existente debe ser un archivo regular: directorios, symlinks y otros tipos no seguros se rechazan con `write_failed` y no se renombran ni se convierten en backups. Si el reemplazo directo no puede sobrescribir un archivo regular existente, se usa un backup temporal del archivo anterior y se intenta restaurarlo si falla el reemplazo final. Snapshots versionados y backups de usuario quedan para un bloque posterior.
 
 Los errores de filesystem se mapean a errores tipados de dominio:
 
